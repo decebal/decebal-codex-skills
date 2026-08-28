@@ -31,7 +31,7 @@ case "$1" in -h|--help) usage 0 ;; esac
 
 IN="$1"; shift
 CRF=28
-AUDIO="-an"
+AUDIO_ARGS=(-an)
 OUT=""
 POSTER=0
 GIF=0
@@ -41,7 +41,7 @@ while [ "$#" -gt 0 ]; do
   case "$1" in
     --crf)        CRF="$2"; shift 2 ;;
     -o|--out)     OUT="$2"; shift 2 ;;
-    --keep-audio) AUDIO=""; shift ;;
+    --keep-audio) AUDIO_ARGS=(); shift ;;
     --poster)     POSTER=1; shift ;;
     --gif)        GIF=1; shift ;;
     --max-width)  MAXW="$2"; shift 2 ;;
@@ -61,8 +61,7 @@ else
   VF="scale=trunc(iw/2)*2:trunc(ih/2)*2"
 fi
 
-# shellcheck disable=SC2086
-ffmpeg -y -i "$IN" -vf "$VF" -c:v libx264 -crf "$CRF" -preset slow -movflags +faststart -pix_fmt yuv420p $AUDIO "$OUT"
+ffmpeg -y -i "$IN" -vf "$VF" -c:v libx264 -crf "$CRF" -preset slow -movflags +faststart -pix_fmt yuv420p "${AUDIO_ARGS[@]}" "$OUT"
 printf 'wrote %s  (%s)\n' "$OUT" "$(du -h "$OUT" | cut -f1)"
 
 if [ "$POSTER" = 1 ]; then
@@ -71,9 +70,13 @@ if [ "$POSTER" = 1 ]; then
 fi
 
 if [ "$GIF" = 1 ]; then
-  pal="$(mktemp -u).png"
+  GIF_TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/web-video-palette.XXXXXX")"
+  cleanup_gif_temp() { rm -rf -- "$GIF_TMPDIR"; }
+  trap cleanup_gif_temp EXIT
+  pal="$GIF_TMPDIR/palette.png"
   ffmpeg -y -i "$OUT" -vf "fps=12,scale=720:-1:flags=lanczos,palettegen" "$pal"
   ffmpeg -y -i "$OUT" -i "$pal" -lavfi "fps=12,scale=720:-1:flags=lanczos[x];[x][1:v]paletteuse" "${base}.gif"
-  rm -f "$pal"
+  cleanup_gif_temp
+  trap - EXIT
   printf 'wrote %s  (%s)\n' "${base}.gif" "$(du -h "${base}.gif" | cut -f1)"
 fi
