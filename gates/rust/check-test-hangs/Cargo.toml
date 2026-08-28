@@ -1,0 +1,25 @@
+# check-test-hangs — reject unbounded real blocking I/O in test files, at
+# AUTHORING time.
+#
+# A test that blocks on a real socket accept/connect, or a real thread sleep,
+# with no bound can hang forever. One such test burned ~40 minutes of CI as a
+# zombie binary thrashing the build lock. A runner's per-test slow-timeout kills
+# and names such a hang at RUNTIME; this rejects the pattern before it lands.
+# Belt and suspenders — see rules/testing-gates.md.
+[package]
+name = "check-test-hangs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "check-test-hangs"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+regex = { workspace = true }
+
+[lints]
+workspace = true

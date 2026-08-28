@@ -1,0 +1,37 @@
+# target-sweep — reclaim a `target/` directory without forcing a cold rebuild.
+#
+# Two kinds of waste accumulate in `target/`, and cargo cleans neither:
+#
+#  1. ORPHANED TEMP DIRS. rustc writes `rustc<rand>/` and `rmeta<rand>/` scratch
+#     directories under `target/debug/deps/` and removes them on a clean exit. A
+#     build that is KILLED never gets there — and a repo whose gates all run
+#     under `timeout 300` (rules/timeouts.md) kills builds routinely. Measured on
+#     one checkout: 137 dirs, 4.2 GiB, every one older than a day.
+#
+#  2. STALE ARTIFACTS. Each fingerprint change writes a NEW hashed artifact and
+#     leaves the old one forever. Same checkout, same day: 33,210 files in
+#     `debug/deps`, 25,546 untouched for a week, ZERO older than 30 days — 77 GiB
+#     regrown in under a month. That half is `cargo sweep`'s job; this binary
+#     reports it and names the command.
+#
+# Zero dependencies (rules/dependency-hygiene.md): it walks directories and
+# shells out.
+[package]
+name = "target-sweep"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+name = "target_sweep"
+path = "src/lib.rs"
+
+[[bin]]
+name = "target-sweep"
+path = "src/main.rs"
+
+[dependencies]
+
+[lints]
+workspace = true

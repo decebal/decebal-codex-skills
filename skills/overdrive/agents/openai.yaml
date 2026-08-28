@@ -1,0 +1,4 @@
+interface:
+  display_name: "Overdrive"
+  short_description: "Help with Overdrive tasks"
+  default_prompt: "Use $overdrive to apply its workflow to this request."

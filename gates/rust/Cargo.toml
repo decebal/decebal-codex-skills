@@ -1,0 +1,63 @@
+# The gate binaries.
+#
+# One workspace so a consumer can build every gate with a single command and get
+# one lockfile:
+#
+#     cargo build --release --manifest-path gates/rust/Cargo.toml
+#     cargo install --path gates/rust/fmt-check      # or any single gate
+#
+# Kept deliberately small (rules/dependency-hygiene.md): twenty-one members resolve
+# FOUR external crates — `regex`, `serde_json`, `proc-macro2`, and `sha2` for the
+# guard's content-trust hash. Several members declare no dependency at all, and
+# several more depend only on the in-workspace config reader.
+#
+# Config is read by `gates-config`, a dependency-free reader for the TOML subset
+# these gates use, rather than by pulling `toml` + `serde` into every gate that
+# wants one string. The same reasoning keeps HTTP out: the two gates that compare
+# against a remote document (`contract-set-drift`, `price-table-check`) read
+# LOCAL files and leave fetching to the caller, so they run offline, are testable
+# without a socket, and add no client stack to a workspace a git hook builds.
+[workspace]
+resolver = "2"
+members = [
+  "authority-check",
+  "check-no-id-refs",
+  "check-test-hangs",
+  "codex-guard",
+  "contract-set-drift",
+  "dev-preflight",
+  "fmt-check",
+  "forbidden-pattern-check",
+  "gates-config",
+  "graph-audit",
+  "layer-boundary-check",
+  "price-table-check",
+  "render-agent-docs",
+  "rust-effective-diff",
+  "skill-metadata-check",
+  "staged-scope",
+  "target-sweep",
+  "test-script-check",
+  "trophy-check",
+  "vendor-attribution-check",
+  "workspace-isolation-check",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[workspace.dependencies]
+gates-config = { path = "gates-config" }
+regex = "1"
+serde_json = "1"
+proc-macro2 = { version = "1", default-features = false }
+sha2 = { version = "0.10", default-features = false }
+
+[workspace.lints.clippy]
+absolute_paths = "warn"
+# A consumer repo vendoring these crates lints under ITS workspace, not this
+# one. Carrying the stricter of the two here keeps a vendored copy clean on
+# arrival instead of warning in someone else's build.
+uninlined_format_args = "warn"

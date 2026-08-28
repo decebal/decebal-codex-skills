@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Prd"
+  short_description: "Help with Codex Prd tasks"
+  default_prompt: "Use $codex-prd to apply its workflow to this request."

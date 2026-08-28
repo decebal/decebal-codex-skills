@@ -1,0 +1,27 @@
+# authority-check — one file owns a derived verdict; every other layer renders it.
+#
+# The failure it prevents: an app carried four separate answers to "can this
+# model call tools" — a hand-copied prefix list, a catalog lookup, upstream repo
+# tags, and the backend heuristic — and they disagreed on shipped ids. A user
+# could see a Download button, a "tool-capable" badge, and a "chat only" banner
+# on the same row. The copies drifted silently, because nothing failed when they did.
+#
+# Distinct from forbidden-pattern-check in one way that matters: it also verifies
+# the AUTHORITY still defines each marker. A ban list whose subject has been
+# deleted guards nothing and says nothing.
+[package]
+name = "authority-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "authority-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

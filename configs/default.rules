@@ -1,0 +1,26 @@
+# Copy to ~/.codex/rules/default.rules or .codex/rules/default.rules.
+# Rules control commands Codex requests to run outside the sandbox. They do not
+# replace sandbox_mode or approval_policy.
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Pushing changes mutates a remote repository",
+    match = ["git push", "git push origin feature/auth"],
+    not_match = ["git status", "git log --oneline"],
+)
+
+prefix_rule(
+    pattern = ["cargo", "publish"],
+    decision = "prompt",
+    justification = "Publishing creates an externally visible crate release",
+    match = ["cargo publish", "cargo publish --dry-run"],
+    not_match = ["cargo test", "cargo build"],
+)
+
+prefix_rule(
+    pattern = ["kubectl"],
+    decision = "prompt",
+    justification = "kubectl can read or mutate live cluster state",
+    match = ["kubectl get pods", "kubectl apply -f deployment.yaml"],
+)

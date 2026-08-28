@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Review"
+  short_description: "Help with Security Review tasks"
+  default_prompt: "Use $security-review to apply its workflow to this request."

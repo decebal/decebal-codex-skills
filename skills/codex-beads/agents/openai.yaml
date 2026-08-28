@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Beads"
+  short_description: "Help with Codex Beads tasks"
+  default_prompt: "Use $codex-beads to apply its workflow to this request."

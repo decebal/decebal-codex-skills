@@ -1,0 +1,27 @@
+# Template for codex-guard's prod-token rules. Copy it, then replace every value.
+#
+# codex-guard resolves this file from the repository root, then the session cwd,
+# then ~/.codex/ — a repo shipping its own copy wins, and the personal copy covers
+# every project that doesn't:
+#
+#   cp configs/prod-guard-tokens.txt ~/.codex/prod-guard-tokens.txt   # personal
+#   cp configs/prod-guard-tokens.txt .codex/prod-guard-tokens.txt     # per repo
+#
+# A mutating command matching a prod: token is denied with a confirmation reason.
+# A mutating command matching both a prod: and a nonprod: token is denied outright,
+# so a single command can never span environments.
+#
+# One token per line. Project IDs, registries, bucket names, cluster names —
+# anything whose presence in a command means "this touches the real thing".
+# Read-only use never matches, so listing an identifier here does not make
+# `gcloud ... list` start prompting.
+#
+# Confirm every entry against the current inventory before relying on it. A stale
+# token silently stops guarding, and nothing warns you when that happens.
+
+prod:my-company-prod
+prod:my-company-platform
+prod:registry.npmjs.org
+
+nonprod:my-company-staging
+nonprod:my-company-dev

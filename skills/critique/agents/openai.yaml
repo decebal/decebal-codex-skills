@@ -1,0 +1,4 @@
+interface:
+  display_name: "Critique"
+  short_description: "Help with Critique tasks and workflows"
+  default_prompt: "Use $critique to apply its workflow to this request."

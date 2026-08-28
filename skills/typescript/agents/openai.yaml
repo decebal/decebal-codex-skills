@@ -1,0 +1,4 @@
+interface:
+  display_name: "Typescript"
+  short_description: "Help with Typescript tasks"
+  default_prompt: "Use $typescript to apply its workflow to this request."

@@ -1,0 +1,28 @@
+name: test-skills
+
+on:
+  push:
+    paths:
+      - "skills/**"
+      - "tests/**"
+      - ".github/workflows/test-skills.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # web-video skill needs ffmpeg/ffprobe.
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      # uv provisions a Python + Pillow on the fly for the blog-image tests
+      # (the test harness uses `uv run --with pillow`).
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Run skill tests
+        run: bash tests/run.sh

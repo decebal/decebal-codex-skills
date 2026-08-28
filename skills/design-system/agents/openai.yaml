@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design System"
+  short_description: "Help with Design System tasks"
+  default_prompt: "Use $design-system to apply its workflow to this request."

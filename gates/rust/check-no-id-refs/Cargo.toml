@@ -1,0 +1,26 @@
+# check-no-id-refs — task-tracker ids must never appear in source code.
+#
+# A tracker id (`t-d0d1d6`, `bd-91f`, `PROJ-123`) means nothing to a reader who
+# does not have that tracker, and ids churn and get archived. Architectural
+# reasons belong in a decision record, cited by number; pure provenance
+# ("added in t-XXXX") belongs in git history. See rules/git-discipline.md.
+#
+# Matched ONLY inside a comment, so a legitimately id-shaped string literal — an
+# app's own task-run ids, a password fixture — is not flagged.
+[package]
+name = "check-no-id-refs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "check-no-id-refs"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+regex = { workspace = true }
+
+[lints]
+workspace = true

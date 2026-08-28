@@ -1,0 +1,25 @@
+# workspace-isolation-check — one half of a repo must not enter the other's
+# build graph.
+#
+# A monorepo that hosts two products usually promises one of them pays nothing
+# for the other. That promise is invisible: a stray path in a members list, or a
+# workspace glob that widens by one character, and every build of the small
+# thing now compiles the big one. Nothing fails — it just gets slower, and the
+# size contract in the design doc quietly stops being true.
+[package]
+name = "workspace-isolation-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "workspace-isolation-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

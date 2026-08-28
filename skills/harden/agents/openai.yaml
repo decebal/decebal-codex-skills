@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harden"
+  short_description: "Help with Harden tasks and workflows"
+  default_prompt: "Use $harden to apply its workflow to this request."

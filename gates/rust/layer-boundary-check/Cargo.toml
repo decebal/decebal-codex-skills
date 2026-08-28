@@ -1,0 +1,26 @@
+# layer-boundary-check — the dependency direction, as a gate.
+#
+# rules/layer-boundaries.md says to make the direction a test rather than a
+# convention, and then shipped without the test. This is it.
+#
+# The direction is DECLARED (an ordered list of layers) and the forbidden pairs
+# are derived from it, so adding a layer does not mean hand-writing N more
+# forbidden patterns. Pairs you cannot fix today get a ceiling that ratchets:
+# exceeding it fails, and so does beating it, because a ceiling nobody lowers
+# stops being a ratchet and becomes a permanent exemption.
+[package]
+name = "layer-boundary-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "layer-boundary-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

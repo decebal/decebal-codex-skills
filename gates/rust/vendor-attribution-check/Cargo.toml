@@ -1,0 +1,23 @@
+# vendor-attribution-check — a vendored dependency must carry its attribution.
+#
+# Three facts, checked per vendored package: the upstream LICENSE file is
+# present, the manifest declares a license, and the package is named in the
+# NOTICE. Vendoring is the one path that copies someone else's code into the
+# repo without a package manager recording where it came from, so nothing else
+# notices when the attribution is left behind.
+[package]
+name = "vendor-attribution-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "vendor-attribution-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

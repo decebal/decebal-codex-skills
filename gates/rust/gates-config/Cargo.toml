@@ -1,0 +1,24 @@
+# gates-config — a dependency-free reader for the TOML subset the gates use.
+#
+# Why not the `toml` crate: every gate here needs a handful of strings and string
+# arrays out of one small, hand-written file. Pulling `toml` + `serde` for that
+# adds six crates to a graph whose whole point is to stay small
+# (rules/dependency-hygiene.md), and it lands in a binary that a git hook builds.
+#
+# The subset is fixed and stated in the lib docs. Anything outside it is a parse
+# ERROR, never a silent skip — a config the reader half-understands is how a gate
+# quietly stops gating (rules/testing-gates.md).
+[package]
+name = "gates-config"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+
+[lints]
+workspace = true

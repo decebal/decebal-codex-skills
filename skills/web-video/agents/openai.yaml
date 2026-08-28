@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Video"
+  short_description: "Help with Web Video tasks"
+  default_prompt: "Use $web-video to apply its workflow to this request."

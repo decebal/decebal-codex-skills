@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# A worked pre-push hook. Copy to .husky/pre-push (or .git/hooks/pre-push) and
+# edit the per-scope blocks.
+#
+# The shape matters more than the contents:
+#
+#   1. The dead-branch guard runs FIRST, before any skip path. It is the one
+#      gate that must not be bypassable, and it needs no toolchain.
+#   2. Every other gate goes through `run_gate`, so all of them are bounded by
+#      the same 300s ceiling and report the same way.
+#   3. `staged-scope` decides which blocks run. `unknown` means run everything.
+#   4. The hook's exit status is $FAILED, accumulated by run_gate.
+#
+# Remember what this is for: where no CI check can be REQUIRED — a private repo
+# on a free plan cannot have protected branches — a green badge means "someone
+# would have seen it", not "it could not have merged". The hook is then not
+# belt-and-braces, it is the braces. Which is why nothing here may be skipped.
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+TRUNK="${TRUNK:-main}"
+
+# ── 1. Unbypassable ──────────────────────────────────────────────────────────
+"$REPO_ROOT/gates/sh/check-branch-not-merged.sh" || exit 1
+
+BRANCH=$(git branch --show-current)
+if [[ "$BRANCH" == "$TRUNK" ]]; then
+  echo "  ✗ refusing to push $TRUNK directly. Use a feature branch and a PR."
+  exit 1
+fi
+
+# ── 2. Machinery ─────────────────────────────────────────────────────────────
+# shellcheck source=../sh/hook-gate-lib.sh
+. "$REPO_ROOT/gates/sh/hook-gate-lib.sh"
+
+# ── 3. Scope ─────────────────────────────────────────────────────────────────
+BASE=$(git merge-base "origin/$TRUNK" HEAD 2>/dev/null || echo "HEAD~1")
+SCOPES=$(staged-scope --range "$BASE" --config "$REPO_ROOT/gates.toml" 2>/dev/null || echo unknown)
+
+has_scope() { grep -qx "$1" <<<"$SCOPES" || grep -qx unknown <<<"$SCOPES"; }
+
+if [[ -z "$SCOPES" ]]; then
+  echo "  [·] nothing in this push can affect a gate."
+  exit 0
+fi
+
+# ── 4. Always ────────────────────────────────────────────────────────────────
+run_gate "[hygiene] agent docs match the manifest" \
+  "render-agent-docs --check"
+run_gate "[hygiene] no tracker ids in source" \
+  "check-no-id-refs --config '$REPO_ROOT/gates.toml'"
+run_gate "[hygiene] no unbounded blocking I/O in tests" \
+  "check-test-hangs --config '$REPO_ROOT/gates.toml'"
+run_gate "[hygiene] Rust format (no cargo, no locks)" \
+  "fmt-check"
+run_gate "[hygiene] vendored deps carry their attribution" \
+  "vendor-attribution-check --config '$REPO_ROOT/gates.toml'"
+
+# ── 5. Per scope ─────────────────────────────────────────────────────────────
+if has_scope backend; then
+  run_gate "[backend] the dependency direction holds" \
+    "layer-boundary-check --config '$REPO_ROOT/gates.toml'"
+  run_gate "[backend] forbidden symbols stay out of guarded paths" \
+    "forbidden-pattern-check --config '$REPO_ROOT/gates.toml'"
+  run_gate "[backend] the other half stays out of this build graph" \
+    "workspace-isolation-check --config '$REPO_ROOT/gates.toml'"
+  # ONE fingerprint for the whole scope: build the test targets, then lint
+  # --all-targets with the SAME features, then run them. Gates that differ in
+  # feature set or check-vs-build mode each compile the graph from scratch.
+  if hook_target_is_cold "$REPO_ROOT/target"; then
+    hook_warm_compile "backend" "cargo build --tests --all-features"
+  fi
+  run_gate "[backend] clippy (incl. test code)" "cargo clippy --all-targets --all-features -- -D warnings"
+  run_gate "[backend] tests"                    "cargo nextest run --all-features"
+fi
+
+if has_scope frontend; then
+  # BEFORE the runners, not after: this one answers whether they will visit the
+  # package at all. A suite in a package with no `test` script is skipped by the
+  # line below it and reports nothing.
+  run_gate "[frontend] every package's scripts reach its own files" \
+    "test-script-check --config '$REPO_ROOT/gates.toml'"
+  run_gate "[frontend] lint"      "bun run lint"
+  run_gate "[frontend] typecheck" "bun run typecheck"
+  run_gate "[frontend] tests"     "bun test"
+  run_gate "[frontend] one authority per derived verdict" \
+    "authority-check --config '$REPO_ROOT/gates.toml'"
+  run_gate "[frontend] remote failures offer a way out" \
+    "bun gates/ts/check-remote-recovery.ts apps/web/src packages/ui/src"
+fi
+
+# ── 6. Gates that need a document fetched first ──────────────────────────────
+# `contract-set-drift` and `price-table-check` read LOCAL files by design, so
+# the fetch is here rather than inside the binary — which keeps them runnable
+# offline and testable without a socket. A fetch that fails must not pass the
+# gate by leaving an empty file behind, so the download and the compare are
+# separate steps and the gate only runs if the download succeeded.
+if has_scope frontend && [[ -n "${CONTRACT_API_URL:-}" ]]; then
+  if curl -fsS "$CONTRACT_API_URL" -o /tmp/api-contract.json; then
+    run_gate "[frontend] the shipped bundle and the API agree, set for set" \
+      "contract-set-drift --left /tmp/api-contract.json --right apps/web/dist/contract.json --config '$REPO_ROOT/gates.toml'"
+  else
+    echo "  [·] contract fetch failed — skipping the drift gate (it is a deploy check, not a diff check)."
+  fi
+fi
+
+exit "$FAILED"

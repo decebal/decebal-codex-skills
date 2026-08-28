@@ -1,0 +1,4 @@
+interface:
+  display_name: "Arrange"
+  short_description: "Help with Arrange tasks and workflows"
+  default_prompt: "Use $arrange to apply its workflow to this request."

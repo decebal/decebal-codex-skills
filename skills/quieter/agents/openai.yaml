@@ -1,0 +1,4 @@
+interface:
+  display_name: "Quieter"
+  short_description: "Help with Quieter tasks and workflows"
+  default_prompt: "Use $quieter to apply its workflow to this request."

@@ -1,0 +1,28 @@
+{
+  "name": "decebal-codex-skills",
+  "version": "1.0.0",
+  "description": "Codex skills, guides, configuration, hooks, and engineering quality gates.",
+  "author": {
+    "name": "Decebal Dobrica",
+    "url": "https://github.com/decebal"
+  },
+  "homepage": "https://github.com/decebal/decebal-codex-skills",
+  "repository": "https://github.com/decebal/decebal-codex-skills",
+  "license": "MIT",
+  "keywords": ["codex", "agent-skills", "engineering", "rust", "chronis"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Decebal Codex Skills",
+    "shortDescription": "Engineering workflows and quality gates for Codex.",
+    "longDescription": "A curated collection of Codex skills, Chronis workflows, project templates, lifecycle-hook examples, and Rust quality gates.",
+    "developerName": "Decebal Dobrica",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/decebal/decebal-codex-skills",
+    "defaultPrompt": [
+      "Show skills relevant to this repository.",
+      "Create a PRD and track it with Chronis.",
+      "Run engineering quality checks on this change."
+    ]
+  }
+}

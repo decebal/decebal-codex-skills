@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Plans"
+  short_description: "Help with Create Plans tasks"
+  default_prompt: "Use $create-plans to apply its workflow to this request."

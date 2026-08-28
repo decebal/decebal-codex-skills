@@ -1,0 +1,30 @@
+# rust-effective-diff — is a change to a Rust source file "code-effective"
+# (affects compilation or behaviour), or purely comments, doc comments,
+# whitespace and formatting?
+#
+# Used by `staged-scope` so the hooks do NOT run the heavy build/lint/test gates
+# for a commit whose only Rust changes are comment or formatting edits. Exits 0
+# when the change is effective (run the gates), 1 when it is not (skip them).
+#
+# One dependency, `proc-macro2`, for tokenizing. Pin it to the version the rest
+# of your tree already resolves so the graph gains no duplicate
+# (rules/dependency-hygiene.md).
+[package]
+name = "rust-effective-diff"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "rust-effective-diff"
+path = "src/main.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+proc-macro2 = { workspace = true }
+
+[lints]
+workspace = true

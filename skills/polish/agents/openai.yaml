@@ -1,0 +1,4 @@
+interface:
+  display_name: "Polish"
+  short_description: "Help with Polish tasks and workflows"
+  default_prompt: "Use $polish to apply its workflow to this request."

@@ -1,0 +1,19 @@
+# Copy selected values to ~/.codex/config.toml for user-wide defaults or to
+# .codex/config.toml in a trusted project for repository-local defaults.
+
+model_reasoning_effort = "medium"
+model_verbosity = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# AGENTS.md remains canonical. Add legacy filenames only when migrating a repo.
+project_doc_fallback_filenames = []
+
+[sandbox_workspace_write]
+network_access = false
+exclude_slash_tmp = true
+exclude_tmpdir_env_var = false
+
+[shell_environment_policy]
+inherit = "core"
+ignore_default_excludes = false

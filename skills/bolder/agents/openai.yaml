@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bolder"
+  short_description: "Help with Bolder tasks and workflows"
+  default_prompt: "Use $bolder to apply its workflow to this request."

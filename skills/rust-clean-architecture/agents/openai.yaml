@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Clean Architecture"
+  short_description: "Help with Rust Clean Architecture tasks"
+  default_prompt: "Use $rust-clean-architecture to apply its workflow to this request."

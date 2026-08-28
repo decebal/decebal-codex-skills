@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bun Testing"
+  short_description: "Help with Bun Testing tasks"
+  default_prompt: "Use $bun-testing to apply its workflow to this request."

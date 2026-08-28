@@ -1,0 +1,5 @@
+# `clippy::absolute_paths` (set to warn in the workspace lints) fires on any path
+# with more than this many segments, so `std::fs::read_to_string` is fine and a
+# one-off `crate::a::b::c::d()` buried mid-function is not. Matches the setting
+# the crates were written under.
+absolute-paths-max-segments = 3

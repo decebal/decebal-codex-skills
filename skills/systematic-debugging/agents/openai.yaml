@@ -1,0 +1,4 @@
+interface:
+  display_name: "Systematic Debugging"
+  short_description: "Help with Systematic Debugging tasks"
+  default_prompt: "Use $systematic-debugging to apply its workflow to this request."

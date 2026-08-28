@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Quality"
+  short_description: "Help with Rust Quality tasks"
+  default_prompt: "Use $rust-quality to apply its workflow to this request."

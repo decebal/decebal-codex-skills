@@ -1,0 +1,146 @@
+name: gates
+
+# The guard rails moved from shell into `gates/rust/codex-guard`, and their
+# tests moved with them. `tests/run.sh` no longer covers them, so without this
+# job the workspace tests would run in NO CI job at all — the failure
+# rules/testing-gates.md names: a gate that runs nowhere is indistinguishable
+# from one that passes.
+#
+# The same reasoning is why the fixture job below exists. A gate's in-process
+# tests all pass while its CONFIG is misread: `gates-config` strings are
+# verbatim, so a `"\\s"` written out of TOML habit compiles to a pattern that
+# matches nothing and the gate reports every file clean. Only running the real
+# binary against a tree with a known violation in it catches that.
+
+on:
+  push:
+    paths:
+      - "gates/**"
+      - "skills/**"
+      - ".github/workflows/gates.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gates/rust
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+          cache-workspaces: gates/rust
+
+      - name: Format check
+        run: cargo fmt --all --check
+
+      - name: Clippy (deny warnings)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Test
+        run: cargo test --workspace
+
+      - name: Validate Codex skill metadata
+        run: cargo run -p skill-metadata-check -- --skills-dir ../../skills --plugin-manifest ../../.codex-plugin/plugin.json
+
+      # The guard is the one gate here that runs on every tool call, so it gets a
+      # smoke test against the real binary as well as its unit tests: a broken
+      # argument parse would pass every in-process test and still deny nothing.
+      - name: Smoke test the guard binary
+        run: |
+          cargo build --release -p codex-guard
+          bin=target/release/codex-guard
+
+          out=$(printf '%s' '{"tool_input":{"command":"terraform apply"},"cwd":"/tmp"}' | "$bin" infra-guard)
+          case "$out" in *'"permissionDecision":"deny"'*) ;; *) echo "no deny: $out"; exit 1;; esac
+
+          out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"gh pr list 2>&1","description":"keep"}}' | "$bin" bash-hygiene)
+          case "$out" in *'"command":"gh pr list"'*) ;; *) echo "no rewrite: $out"; exit 1;; esac
+          case "$out" in *'"description":"keep"'*) ;; *) echo "rewrite dropped a sibling field: $out"; exit 1;; esac
+
+          printf '%s' '{"tool_name":"Bash","tool_input":{"command":"ls && pwd"}}' | "$bin" bash-hygiene && { echo "chain not blocked"; exit 1; }
+
+          out=$(printf '%s' '{"tool_name":"Bash","tool_input":{"command":"ls -la"}}' | "$bin" bash-hygiene)
+          [ -z "$out" ] || { echo "clean command produced output: $out"; exit 1; }
+
+          echo "guard smoke OK"
+
+      # Each gate is pointed at a tree holding exactly one known violation, and
+      # must FAIL. A gate that passes here is not clean — it is not looking.
+      - name: Smoke test the config-driven gates against a fixture
+        run: |
+          cargo build --release \
+            -p layer-boundary-check -p forbidden-pattern-check -p authority-check \
+            -p vendor-attribution-check -p test-script-check
+          bin="$PWD/target/release"
+
+          fx=$(mktemp -d)
+          mkdir -p "$fx"/src/{domain,application,presentation,infrastructure} \
+                   "$fx"/app/src "$fx"/third_party/tiny "$fx"/packages/ui/src
+
+          printf 'use crate::presentation::Handler;\n'          > "$fx/src/application/svc.rs"
+          printf 'pub struct Handler;\n'                        > "$fx/src/presentation/http.rs"
+          printf 'pub struct Db;\n'                             > "$fx/src/infrastructure/db.rs"
+          printf 'pub struct Job;\n'                            > "$fx/src/domain/job.rs"
+          printf 'use keyring;\n'                               > "$fx/src/infrastructure/secrets.rs"
+          printf 'pub const MARKER_A: u8 = 0;\n'                > "$fx/src/infrastructure/authority.rs"
+          printf 'const x = MARKER_A\n'                         > "$fx/app/src/Renderer.ts"
+          printf '[package]\nname = "tiny"\n'                   > "$fx/third_party/tiny/Cargo.toml"
+          printf 'bundles tiny\n'                               > "$fx/third_party/NOTICE"
+          printf '{"name":"root","workspaces":["packages/*"]}\n' > "$fx/package.json"
+          printf '{}\n'                                          > "$fx/turbo.json"
+          printf '{"name":"@fx/ui","scripts":{"build":"echo"}}\n' > "$fx/packages/ui/package.json"
+          printf 'test("a", () => {})\n'                        > "$fx/packages/ui/src/a.test.ts"
+
+          cat > "$fx/gates.toml" <<'CFG'
+          [layers]
+          order = ["presentation", "application", "infrastructure"]
+          pure  = ["domain"]
+
+          [layers.dir]
+          presentation   = "src/presentation/"
+          application    = "src/application/"
+          infrastructure = "src/infrastructure/"
+          domain         = "src/domain/"
+
+          [forbidden.keychain]
+          roots      = ["src/"]
+          extensions = ["rs"]
+          patterns   = ["use\s+keyring"]
+
+          [authority.marker]
+          authority  = "src/infrastructure/authority.rs"
+          renderers  = ["app/src/"]
+          extensions = ["ts"]
+          markers    = ["MARKER_A"]
+
+          [vendoring]
+          roots  = ["third_party/"]
+          notice = "third_party/NOTICE"
+
+          [test-scripts]
+          root_markers = ["turbo.json"]
+
+          [test-scripts.script.test]
+          stems      = [".test"]
+          extensions = ["ts"]
+          CFG
+
+          git -C "$fx" init -q
+          git -C "$fx" add -A
+
+          cd "$fx"
+          for gate in layer-boundary-check forbidden-pattern-check authority-check \
+                      vendor-attribution-check test-script-check; do
+            if "$bin/$gate" --config gates.toml; then
+              echo "FAIL: $gate passed a tree with a known violation in it"
+              exit 1
+            fi
+            echo "  $gate caught its violation"
+          done
+          echo "fixture smoke OK"

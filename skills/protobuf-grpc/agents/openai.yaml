@@ -1,0 +1,4 @@
+interface:
+  display_name: "Protobuf Grpc"
+  short_description: "Help with Protobuf Grpc tasks"
+  default_prompt: "Use $protobuf-grpc to apply its workflow to this request."

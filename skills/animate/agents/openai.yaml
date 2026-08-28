@@ -1,0 +1,4 @@
+interface:
+  display_name: "Animate"
+  short_description: "Help with Animate tasks and workflows"
+  default_prompt: "Use $animate to apply its workflow to this request."

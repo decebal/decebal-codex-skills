@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bun Development"
+  short_description: "Help with Bun Development tasks"
+  default_prompt: "Use $bun-development to apply its workflow to this request."

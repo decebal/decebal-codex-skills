@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delight"
+  short_description: "Help with Delight tasks and workflows"
+  default_prompt: "Use $delight to apply its workflow to this request."

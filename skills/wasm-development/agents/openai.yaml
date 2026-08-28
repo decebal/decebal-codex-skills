@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wasm Development"
+  short_description: "Help with Wasm Development tasks"
+  default_prompt: "Use $wasm-development to apply its workflow to this request."

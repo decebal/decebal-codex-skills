@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bundle Analysis"
+  short_description: "Help with Bundle Analysis tasks"
+  default_prompt: "Use $bundle-analysis to apply its workflow to this request."

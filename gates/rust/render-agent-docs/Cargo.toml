@@ -1,0 +1,20 @@
+# render-agent-docs — generate one or more AGENTS.md files from one manifest.
+#
+# Rule fragments are embedded because Codex does not expand Markdown `@` imports.
+# One manifest plus `--check` keeps generated guidance deterministic.
+[package]
+name = "render-agent-docs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "render-agent-docs"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

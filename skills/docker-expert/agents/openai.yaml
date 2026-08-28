@@ -1,0 +1,4 @@
+interface:
+  display_name: "Docker Expert"
+  short_description: "Help with Docker Expert tasks"
+  default_prompt: "Use $docker-expert to apply its workflow to this request."

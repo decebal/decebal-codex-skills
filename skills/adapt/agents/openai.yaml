@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adapt"
+  short_description: "Help with Adapt tasks and workflows"
+  default_prompt: "Use $adapt to apply its workflow to this request."

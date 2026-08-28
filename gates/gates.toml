@@ -1,0 +1,232 @@
+# gates.toml — a worked example. Copy it to your repo root and edit the paths.
+#
+# Read by `staged-scope` and `check-test-hangs`. Both fail LOUDLY when this file
+# is missing or matches nothing, rather than passing by checking zero files: a
+# gate that scans nothing prints the same tick as one that scans everything
+# (rules/testing-gates.md).
+
+# Strings here are VERBATIM — there is no escape processing, so a regex is
+# written as it would be inside a raw string: "use\s+keyring", never
+# "use\\s+keyring". Doubling the backslash out of TOML habit compiles to a
+# pattern that matches nothing, and the gate then reports every file clean.
+
+# ── Scopes ───────────────────────────────────────────────────────────────────
+# Each [scope.<name>] declares the paths whose change can break that scope's
+# gates. `staged-scope` prints the names a diff touches; the hook switches on
+# them and runs only those gates.
+#
+# Pattern shapes, in the order they are tried:
+#   "dir/"        directory prefix — everything under it
+#   "a/*/b"       glob, where `*` matches any run of characters
+#   "Cargo.toml"  exact path — the ROOT manifest, not every nested one
+#
+# One file may belong to several scopes; that is a set, not a verdict. A shared
+# lockfile legitimately triggers both halves of a monorepo.
+
+[scope.backend]
+paths = [
+  "apps/api/",
+  "crates/",
+  "Cargo.toml",
+  "Cargo.lock",
+  "rust-toolchain.toml",
+  # Build flags are hashed into every artifact's fingerprint, so a change here
+  # can invalidate the whole build directory with no source file edited.
+  ".cargo/config.toml",
+]
+
+[scope.frontend]
+paths = [
+  "apps/web/",
+  "packages/",
+  "package.json",
+  "bun.lock",
+  "turbo.json",
+  "biome.json",
+  "tsconfig.json",
+]
+
+[scope.workflow]
+paths = [".github/", ".husky/", "gates/"]
+
+# ── Inert paths ──────────────────────────────────────────────────────────────
+# Paths that legitimately run NO gate. Everything matching neither a scope nor
+# this list emits `unknown`, which the hook must expand to "run everything".
+#
+# That default-deny is the point of the whole file. Without it, a new top-level
+# directory runs zero gates forever and nothing says so — which is exactly what
+# happened to one repo's `apps/web/**`: 157 tracked files, no gate, for months.
+[gates]
+inert = [
+  "docs/",
+  "reports/",
+  "media/",
+  "*.md",
+  "LICENSE",
+  ".gitignore",
+  ".dockerignore",
+  ".env.example",
+]
+
+# ── Test-hang tiers ──────────────────────────────────────────────────────────
+# Which checks apply to which trees. `sockets` rejects a real socket bind/connect
+# in a test file; `sleeps` rejects a blocking thread sleep. Both honour an inline
+# `// test-hang-allow: <reason>` on the line or the line directly above.
+
+[test-hangs.backend]
+paths  = ["apps/api/", "crates/"]
+checks = ["sockets", "sleeps"]
+
+# The second tier is the interesting one. A suite that stands up real test
+# servers on ephemeral ports BY DESIGN turns the socket check into an
+# allowlist-marking exercise with no bug behind it — but nothing about that
+# justifies a real `thread::sleep`. Splitting the tiers keeps the sleep rule
+# where a 40ms timing margin once failed CI on a loaded runner and blocked a
+# deploy.
+[test-hangs.services]
+paths  = ["services/"]
+checks = ["sleeps"]
+
+# ── Tracker ids in source ────────────────────────────────────────────────────
+# `check-no-id-refs` reads every tracked source file by default. Narrow it with
+# `roots`, widen the shapes for your tracker. Markdown is never read: decision
+# records and plans cite ids on purpose.
+[id-refs]
+roots      = ["apps/", "crates/", "packages/"]
+shapes     = ["t-[0-9a-f]{4,}", "bd-[0-9a-z]{3,}"]
+extensions = ["rs", "ts", "tsx", "svelte"]
+
+# ── Layer boundaries ─────────────────────────────────────────────────────────
+# `layer-boundary-check` derives the forbidden pairs from the DIRECTION, so
+# adding a layer does not mean hand-writing N more patterns.
+
+[layers]
+order  = ["presentation", "application", "infrastructure"]
+pure   = ["domain"]
+import = "use crate::{layer}"
+
+[layers.dir]
+presentation   = "apps/api/src/presentation/"
+application    = "apps/api/src/application/"
+infrastructure = "apps/api/src/infrastructure/"
+domain         = "apps/api/src/domain/"
+
+# What you cannot fix today. Absent means 0. Beating a ceiling FAILS too — a
+# ceiling nobody tightens stops being a ratchet and becomes an exemption, and
+# the next violation slips in under it without failing anything.
+[layers.ceiling]
+presentation_to_infrastructure = "12"
+
+# The one sanctioned seam across an edge, exempt from its ceiling. Its call-site
+# count is then the migration metric.
+[layers.facade]
+presentation_to_infrastructure = "apps/api/src/presentation/infra.rs"
+
+# ── Forbidden patterns ───────────────────────────────────────────────────────
+# One table per rule. A rule that selects NO file is exit 2, not a skip: the two
+# shell gates this replaced both printed "not found — skipping" and exited 0, so
+# a rename silently retired the rule and nothing said so.
+
+[forbidden.keychain]
+roots      = ["apps/desktop/src/"]
+extensions = ["rs"]
+patterns   = ["use\s+keyring", "keyring::Entry::new"]
+allow      = ["apps/desktop/src/infrastructure/external/secrets.rs"]
+why        = "Secret storage goes to the disk vault, not the OS keychain."
+
+[forbidden.opaque-blob-routes]
+files    = ["apps/api/src/interfaces/http/vault.rs"]
+patterns = ["decrypt", "argon2", "Aes256Gcm", "hkdf"]
+why      = "These routes carry ciphertext only — no server-side key exists."
+
+# ── One authority per derived verdict ────────────────────────────────────────
+
+[authority.tool-capability]
+authority  = "apps/desktop/src/application/model_capabilities.rs"
+renderers  = ["apps/app/src/", "packages/"]
+extensions = ["ts", "svelte"]
+markers    = ["TOOL_CAPABLE_PREFIXES", "modelSupportsTools"]
+contract   = "apps/app/src/lib/infrastructure/tauri/llm-api.ts"
+retired    = ["disabled_workflow_only"]
+why        = "Capability is decided once and travels on the wire as `tool_capable`."
+
+# ── Package scripts must reach package files ─────────────────────────────────
+# A requirement WITH `stems` asks "does this package own suites?"; one without
+# asks "does it own typed source at all?".
+
+[test-scripts]
+root_markers = ["turbo.json"]
+
+[test-scripts.script.test]
+stems      = [".test", "_test", ".spec", "_spec", ".vitest"]
+extensions = ["ts", "tsx", "js", "jsx", "mts", "cts", "mjs", "cjs"]
+fix        = "add a test script — bun test, or vitest run"
+
+[test-scripts.script.typecheck]
+extensions = ["ts", "tsx", "mts", "cts", "svelte"]
+fix        = "add a typecheck script — tsc --noEmit, or svelte-check where .svelte exists"
+
+# ── Vendored dependencies carry their attribution ────────────────────────────
+
+[vendoring]
+roots  = ["third_party/"]
+notice = "third_party/NOTICE"
+
+# ── One half of the repo stays out of the other's build graph ────────────────
+
+[isolation.control-plane]
+manifest     = "apps/desktop/Cargo.toml"
+forbid_paths = ["/control-plane/"]
+lockfiles    = ["bun.lock"]
+forbid_names = ["@acme-control-plane/"]
+why          = "The desktop build must not pay for the server's dependencies."
+
+# ── Contract halves must declare the same SETS ───────────────────────────────
+# Both documents are read from disk. Fetch them with curl in the hook — a gate
+# that opens its own socket cannot run offline or be tested without one.
+
+[contract-drift.web]
+left_label  = "api"
+right_label = "bundle"
+left_map    = "features"
+right_map   = "contract.features"
+set_key     = "operations"
+why         = "The reading side gates on exact set equality, so a diff blanks the page."
+
+# ── A shipped price table, against a published reference ─────────────────────
+# `reference_scale` brings a per-token reference into our per-million units.
+
+[price-table]
+ours_map         = "models"
+ours_input       = "input_per_million"
+ours_output      = "output_per_million"
+reference_map    = ""
+reference_input  = "input_cost_per_token"
+reference_output = "output_cost_per_token"
+reference_scale  = "1000000"
+tolerance        = "0.0001"
+allow            = ["local/bundled"]
+
+# ── Promised tests must be real tests ────────────────────────────────────────
+
+[trophy]
+manifest_path = "apps/desktop/Cargo.toml"
+packages      = ["my-app"]
+features      = ["my-app/test-support"]
+
+[trophy.entry.us-001-unit]
+story       = "US-001"
+layer       = "unit"
+pattern     = "step_run & records_id"
+block_merge = "true"
+desc        = "A step run records its id"
+
+# ── Dev-launch pre-flight ────────────────────────────────────────────────────
+# Scoped to binaries under THIS checkout, so an installed copy is never touched.
+
+[dev-preflight]
+binaries      = ["target/debug/my-app", "target/release/my-app"]
+sockets       = ["/tmp/com_example_app_si.sock"]
+socket_prefix = "my-app-crash-"
+helper_marker = "--crash-monitor"
+grace_ms      = "1500"

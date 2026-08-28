@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gcp Cloudrun"
+  short_description: "Help with Gcp Cloudrun tasks"
+  default_prompt: "Use $gcp-cloudrun to apply its workflow to this request."

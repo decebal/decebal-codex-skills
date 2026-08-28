@@ -1,0 +1,5 @@
+# Local Chronis event store
+.chronis/
+
+# macOS metadata
+.DS_Store

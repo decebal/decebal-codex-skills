@@ -1,0 +1,4 @@
+interface:
+  display_name: "Blog Image"
+  short_description: "Help with Blog Image tasks"
+  default_prompt: "Use $blog-image to apply its workflow to this request."

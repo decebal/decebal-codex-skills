@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dev Browser"
+  short_description: "Help with Dev Browser tasks"
+  default_prompt: "Use $dev-browser to apply its workflow to this request."

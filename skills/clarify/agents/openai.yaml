@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clarify"
+  short_description: "Help with Clarify tasks and workflows"
+  default_prompt: "Use $clarify to apply its workflow to this request."

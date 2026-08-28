@@ -1,0 +1,25 @@
+# forbidden-pattern-check — a named set of patterns must not appear under a
+# named set of paths.
+#
+# The shape two separate shell gates had independently grown: "these files are a
+# pure X path, so none of these symbols may appear in them", each with its own
+# allowlist and its own ad-hoc comment stripping. One config-driven gate replaces
+# both, and closes the hole both of them shipped with — a rule whose paths have
+# moved fails here instead of printing "skipping".
+[package]
+name = "forbidden-pattern-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "forbidden-pattern-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+regex = { workspace = true }
+
+[lints]
+workspace = true

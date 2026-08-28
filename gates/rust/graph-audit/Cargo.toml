@@ -1,0 +1,23 @@
+# graph-audit — cross-check docs and tasks against a code-graph oracle.
+#
+# The graph is ground truth for what code exists; docs and tasks are claims.
+# This resolves every code reference in a claim and reports the mismatches,
+# separating LIVING docs (a stale reference is a bug) from HISTORICAL ones
+# (a stale reference is expected).
+[package]
+name = "graph-audit"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "graph-audit"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { workspace = true }
+regex = { workspace = true }
+
+[lints]
+workspace = true

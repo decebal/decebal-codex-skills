@@ -1,0 +1,30 @@
+# dev-preflight — clear the state that makes a dev launch look like a hang.
+#
+# The failure: Ctrl-C on a `task dev` chain tears down the build tool but not the
+# app it spawned. The OS reparents the app, so it keeps running invisibly. On the
+# NEXT launch the port-freeing step kills the dev server the orphan's webview
+# points at (its window goes white), the new process starts, a single-instance
+# plugin finds the orphan still owning the lock socket, forwards its argv and
+# exits 0 from inside the builder — no error, no panic, no log line — and the
+# orphan raises its blank window.
+#
+# A successful compile, a dead log, and a white window. It reads as a hung boot,
+# and restarting cannot fix it because every restart recreates the same state.
+#
+# Scoped to binaries under THIS checkout, so an installed copy is never touched.
+[package]
+name = "dev-preflight"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "dev-preflight"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Onboard"
+  short_description: "Help with Onboard tasks and workflows"
+  default_prompt: "Use $onboard to apply its workflow to this request."

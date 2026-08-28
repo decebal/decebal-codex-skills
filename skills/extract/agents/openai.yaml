@@ -1,0 +1,4 @@
+interface:
+  display_name: "Extract"
+  short_description: "Help with Extract tasks and workflows"
+  default_prompt: "Use $extract to apply its workflow to this request."

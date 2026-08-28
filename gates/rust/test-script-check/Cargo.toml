@@ -1,0 +1,28 @@
+# test-script-check — a package's own gates must reach its own files.
+#
+# A monorepo task runner's tasks are global: `test` and `typecheck` run whatever
+# packages DECLARE the matching script and silently resolve the rest to nothing.
+# A package with suites but no `test` script therefore runs in no gate anywhere —
+# not the quality command, not the hook, not CI — and work that runs nowhere is
+# indistinguishable from work that passes.
+#
+# Measured on the repo this came from: one package with three co-located suites
+# and no `scripts` block at all, and seven packages holding 756 typed files with
+# no `typecheck`. Nothing failed while they were dead, which is the whole problem.
+[package]
+name = "test-script-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "test-script-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

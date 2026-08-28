@@ -1,0 +1,4 @@
+interface:
+  display_name: "Distill"
+  short_description: "Help with Distill tasks and workflows"
+  default_prompt: "Use $distill to apply its workflow to this request."

@@ -1,0 +1,24 @@
+# staged-scope — classify a diff into build scopes, so a hook runs only the
+# gates the change can possibly break.
+#
+# The valuable part is not the classification, it is the DEFAULT-DENY: any path
+# matching no scope and no inert entry emits `unknown`, which the caller expands
+# to "run everything" and prints. Without it a new top-level directory runs zero
+# gates forever and nothing says so — which is exactly what happened to one repo's
+# `apps/web/**`: 157 tracked files, no gate, for months.
+[package]
+name = "staged-scope"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "staged-scope"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+
+[lints]
+workspace = true

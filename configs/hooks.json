@@ -1,0 +1,37 @@
+{
+  "description": "Optional codex-guard lifecycle hooks. Install codex-guard before enabling.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard infra-guard",
+            "timeout": 10,
+            "statusMessage": "Checking infrastructure command"
+          },
+          {
+            "type": "command",
+            "command": "codex-guard bash-hygiene",
+            "timeout": 5,
+            "statusMessage": "Checking shell command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard comment-hygiene",
+            "timeout": 5,
+            "statusMessage": "Reviewing added comments"
+          }
+        ]
+      }
+    ]
+  }
+}

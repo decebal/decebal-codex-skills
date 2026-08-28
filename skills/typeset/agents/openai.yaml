@@ -1,0 +1,4 @@
+interface:
+  display_name: "Typeset"
+  short_description: "Help with Typeset tasks and workflows"
+  default_prompt: "Use $typeset to apply its workflow to this request."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Feature Spec"
+  short_description: "Help with Feature Spec tasks"
+  default_prompt: "Use $feature-spec to apply its workflow to this request."

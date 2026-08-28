@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fastify Expert"
+  short_description: "Help with Fastify Expert tasks"
+  default_prompt: "Use $fastify-expert to apply its workflow to this request."

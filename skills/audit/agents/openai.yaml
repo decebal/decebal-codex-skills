@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit"
+  short_description: "Help with Audit tasks and workflows"
+  default_prompt: "Use $audit to apply its workflow to this request."

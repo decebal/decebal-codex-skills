@@ -1,0 +1,4 @@
+interface:
+  display_name: "Colorize"
+  short_description: "Help with Colorize tasks and workflows"
+  default_prompt: "Use $colorize to apply its workflow to this request."

@@ -1,0 +1,38 @@
+# codex-guard — the guard-rail hooks, as one binary instead of five shell
+# scripts.
+#
+# The shell versions needed `jq` on every firing and `perl` on every Bash call.
+# Both are runtime dependencies of a hook that fires on EVERY tool call, and a
+# missing one made the hook a silent no-op — the failure mode rules/testing-gates.md
+# calls out by name, wearing a green tick. A binary has no runtime dependency at
+# all: it either exists or the hook command fails loudly.
+#
+# It is also faster where it matters. A shell hook forks bash, then jq, then perl
+# — three process spawns before the first byte of policy is evaluated, on every
+# Bash call you make.
+#
+# Subcommands rather than four binaries: they share the stdin envelope, the
+# decision writers, and the pattern library, and one `cargo install` wires all of
+# them.
+[package]
+name = "codex-guard"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "codex-guard"
+path = "src/main.rs"
+
+[dependencies]
+regex = { workspace = true }
+serde_json = { workspace = true }
+# The kosher cache is a security decision recorded by content hash: "I reviewed
+# this exact chain". That deserves a real digest rather than a fast non-crypto
+# hash, and the bytes hashed are identical to what `shasum -a 256` produced, so
+# an existing ~/.codex/infra-guard-kosher.txt keeps working.
+sha2 = { workspace = true }
+
+[lints]
+workspace = true

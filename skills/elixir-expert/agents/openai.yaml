@@ -1,0 +1,4 @@
+interface:
+  display_name: "Elixir Expert"
+  short_description: "Help with Elixir Expert tasks"
+  default_prompt: "Use $elixir-expert to apply its workflow to this request."

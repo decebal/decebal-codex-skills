@@ -1,0 +1,26 @@
+# price-table-check — a shipped price table, checked against a published reference.
+#
+# A wrong price is invisible in place: it looks exactly like a right one, and
+# every test that reads the table agrees with it. The only way to know is to ask
+# a source that is not us.
+#
+# Two documents of `id -> {input, output}`, both read from disk. Fetching the
+# reference is the caller's job, so the gate runs offline and its comparison is
+# testable without a network.
+[package]
+name = "price-table-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "price-table-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

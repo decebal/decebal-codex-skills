@@ -1,0 +1,22 @@
+# One manifest generates one or more AGENTS.md instruction files.
+# `render-agent-docs --check` fails when a generated target drifts.
+
+rules = [
+  "git-discipline",
+  "evidence-discipline",
+  "definition-of-done",
+  "comments",
+  "token-efficiency",
+  "testing-gates",
+]
+
+# Rule fragments are embedded in output because Codex does not expand Markdown
+# `@` imports. Relative paths resolve from renderer working directory.
+rules_dir = "rules"
+
+# Repository-specific stack, commands, and boundaries append after shared rules.
+overlay = "docs/agent-overlay.md"
+
+[targets.agents]
+path  = "AGENTS.md"
+title = "AGENTS.md — Acme instructions"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain Module"
+  short_description: "Help with Explain Module tasks"
+  default_prompt: "Use $explain-module to apply its workflow to this request."

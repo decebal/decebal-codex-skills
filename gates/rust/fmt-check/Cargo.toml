@@ -1,0 +1,25 @@
+# fmt-check — the whole-repo rustfmt gate, without cargo.
+#
+# A formatting check compiles nothing, so it should not wait on cargo's locks:
+# `target/.cargo-lock` per worktree, and `~/.cargo/.package-cache`, which is one
+# lock for the whole MACHINE that a per-worktree `target/` does not isolate. This
+# binary reads the manifests itself and drives `rustfmt` directly — measured at
+# 1.2s for two workspaces, against 11s for the two `cargo fmt` gates it replaced.
+#
+# ZERO dependencies: it walks manifests and shells out, so it adds no crates and
+# no duplicate versions to the graph (rules/dependency-hygiene.md).
+[package]
+name = "fmt-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "fmt-check"
+path = "src/main.rs"
+
+[dependencies]
+
+[lints]
+workspace = true

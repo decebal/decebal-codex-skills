@@ -1,0 +1,4 @@
+interface:
+  display_name: "Normalize"
+  short_description: "Help with Normalize tasks"
+  default_prompt: "Use $normalize to apply its workflow to this request."

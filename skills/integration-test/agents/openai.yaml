@@ -1,0 +1,4 @@
+interface:
+  display_name: "Integration Test"
+  short_description: "Help with Integration Test tasks"
+  default_prompt: "Use $integration-test to apply its workflow to this request."

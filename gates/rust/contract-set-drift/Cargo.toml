@@ -1,0 +1,29 @@
+# contract-set-drift — two halves of a contract must declare the same SETS.
+#
+# A version number cannot see this failure. Both sides of one outage carried
+# contract version `1` throughout while a shipped bundle demanded one operation
+# where the server declared six, and another screen demanded eight the server had
+# deleted. The gate on the reading side was exact set equality, so both screens
+# vanished and every user was told the feature "is not enabled for your
+# workspace".
+#
+# Reads two LOCAL documents. Fetching is the caller's job — a gate that opens a
+# socket cannot run offline, cannot be unit-tested without one, and would put an
+# HTTP stack into a workspace that has four dependencies.
+[package]
+name = "contract-set-drift"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "contract-set-drift"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

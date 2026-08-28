@@ -1,0 +1,27 @@
+# trophy-check — every promised test must be a REAL test.
+#
+# A plan's testing section is a checklist, and a checklist is satisfied by
+# writing "tests added". This maps each promised line to a test the runner can
+# actually enumerate, so the claim is checked against the binary rather than
+# against the author.
+#
+# Presence by default (fast: it lists rather than runs); `--run` executes the
+# matched tests too, because a test that exists and fails satisfies the letter of
+# the promise and none of its point.
+[package]
+name = "trophy-check"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "trophy-check"
+path = "src/main.rs"
+
+[dependencies]
+gates-config = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

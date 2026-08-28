@@ -1,0 +1,4 @@
+interface:
+  display_name: "Monorepo Expert"
+  short_description: "Help with Monorepo Expert tasks"
+  default_prompt: "Use $monorepo-expert to apply its workflow to this request."

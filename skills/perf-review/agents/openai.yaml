@@ -1,0 +1,4 @@
+interface:
+  display_name: "Perf Review"
+  short_description: "Help with Perf Review tasks"
+  default_prompt: "Use $perf-review to apply its workflow to this request."

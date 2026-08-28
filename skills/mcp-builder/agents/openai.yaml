@@ -1,0 +1,4 @@
+interface:
+  display_name: "MCP Builder"
+  short_description: "Help with MCP Builder tasks"
+  default_prompt: "Use $mcp-builder to apply its workflow to this request."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Arch"
+  short_description: "Help with Arch tasks and workflows"
+  default_prompt: "Use $arch to apply its workflow to this request."
