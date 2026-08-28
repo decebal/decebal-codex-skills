@@ -1,7 +1,7 @@
 # Skills Overview
 
 Skills extend Codex with domain-specific knowledge and workflows. Install them
-project-wide under `.agents/skills/` or user-wide under `~/.agents/skills/`.
+project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 
 ## Installed Skills
 
@@ -9,7 +9,7 @@ project-wide under `.agents/skills/` or user-wide under `~/.agents/skills/`.
 
 | Skill | Purpose | Trigger Phrases |
 |-------|---------|-----------------|
-| **dev-browser** | Browser automation with Playwright | "go to url", "take screenshot", "fill form" |
+| **codex-browser** | Route browser work to native Codex controls | "go to url", "take screenshot", "fill form" |
 | **typescript** | TS performance, tsconfig, type errors | "optimize typescript", TS error codes |
 | **bun-development** | Bun runtime, migration from Node | Working with Bun projects |
 | **docker-expert** | Docker builds, security, orchestration | Dockerfile work, container issues |
@@ -61,18 +61,18 @@ project-wide under `.agents/skills/` or user-wide under `~/.agents/skills/`.
 | Skill | Purpose | Trigger Phrases |
 |-------|---------|-----------------|
 | **find-skills** | Discover & install new skills | "find a skill for X", "how do I do X" |
-| **skill-creator** | Guide for authoring new skills | "create a new skill" |
+| **codex-skill-development** | Repository skill authoring with Codex gates | "create a repository skill" |
 
 ## Skill Locations
 
 ```
-~/.agents/skills/
+~/.codex/skills/
 ├── typescript/                    # Direct install
 ├── bun-development/               # Direct install
 ├── docker-expert/                 # Direct install
-├── skill-creator/                 # Direct install
+├── codex-skill-development/       # Direct install
 ├── brainstorming -> ~/.agents/skills/brainstorming
-├── dev-browser -> ~/.agents/skills/dev-browser
+├── codex-browser/                 # Direct install
 ├── feature-spec -> ~/.agents/skills/feature-spec
 ├── find-skills -> ~/.agents/skills/find-skills
 ├── mcp-builder -> ~/.agents/skills/mcp-builder
@@ -100,7 +100,7 @@ project-wide under `.agents/skills/` or user-wide under `~/.agents/skills/`.
 
 ```bash
 # User-wide install (symlink from custom location)
-ln -s /path/to/skill ~/.agents/skills/skill-name
+ln -s /path/to/skill ~/.codex/skills/skill-name
 
 # Project install
 mkdir -p .agents/skills

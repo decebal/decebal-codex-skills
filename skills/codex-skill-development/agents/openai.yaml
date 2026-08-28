@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Skill Development"
+  short_description: "Build repository skills with Codex gates"
+  default_prompt: "Use $codex-skill-development to create or update an installable skill in this repository."

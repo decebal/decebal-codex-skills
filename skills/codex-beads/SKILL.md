@@ -141,7 +141,7 @@ Examples:
 - `- [ ] Add investorType column with default 'cold'`
 - `- [ ] Toggle shows confirmation dialog`
 - `- [ ] Filter persists in URL params`
-- `- [ ] Verify in browser using dev-browser skill` (UI stories only)
+- `- [ ] Verify in browser using $codex-browser` (UI stories only)
 - `- [ ] Playwright e2e test passes: bunx playwright test tests/toggle.spec.ts` (when story has a specific test)
 - `- [ ] Visual snapshot updated and matches expected` (when story changes visible UI)
 
@@ -170,7 +170,7 @@ Look for the "Quality Gates" section in the PRD. Translate any `pnpm`/`npm`/`npx
 - `bun lint` - Linting
 
 For UI stories:
-- Verify in browser using dev-browser skill
+- Verify in browser using `$codex-browser`
 ```
 
 Classify each gate:
@@ -329,7 +329,7 @@ Add ability to mark investors as "friends" for warm outreach.
 - `bun lint` - Linting
 
 For UI stories:
-- Verify in browser using dev-browser skill
+- Verify in browser using `$codex-browser`
 
 ## User Stories
 
@@ -392,7 +392,7 @@ As Ryan, I want to toggle investor type directly from the list.
 - [ ] Each row has Cold | Friend toggle
 - [ ] Switching shows confirmation dialog
 - [ ] On confirm: updates type in database
-- [ ] Verify in browser using dev-browser skill
+- [ ] Verify in browser using `$codex-browser`
 
 Mark each item [x] as you complete it. Only close when all are checked.
 EOF
@@ -410,7 +410,7 @@ As Ryan, I want to filter the list to see just friends or cold.
 ## Acceptance Criteria
 - [ ] Filter dropdown: All | Cold | Friend
 - [ ] Filter persists in URL params
-- [ ] Verify in browser using dev-browser skill
+- [ ] Verify in browser using `$codex-browser`
 
 Mark each item [x] as you complete it. Only close when all are checked.
 EOF

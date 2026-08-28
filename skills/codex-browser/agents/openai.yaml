@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Browser"
+  short_description: "Route browser work to native Codex controls"
+  default_prompt: "Use $codex-browser to choose and operate the correct Codex browser surface."

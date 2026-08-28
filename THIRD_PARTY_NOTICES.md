@@ -5,7 +5,6 @@ Repository includes modified material derived from
 
 - `skills/frontend-design/`
 - `skills/mcp-builder/`
-- `skills/skill-creator/`
 
 Those directories remain licensed under Apache License 2.0. Each directory
 contains its upstream `LICENSE.txt` and a modification `NOTICE.md`; repository

@@ -65,7 +65,7 @@ What commands validate the codebase? These run ONCE when all stories are done (e
    E. Other: [specify your commands]
 
 For individual stories, what story-specific checks apply?
-   A. UI stories: verify in browser using dev-browser skill
+   A. UI stories: verify in browser using `$codex-browser`
    B. UI stories: Playwright e2e test for that story
    C. Backend stories: curl/test the specific endpoint
    D. Other: [specify]
@@ -131,7 +131,7 @@ General codebase checks. These validate the whole project and run ONCE when all 
 
 ### Story-Level (checked per story)
 Criteria checked on specific stories where relevant:
-- **UI stories:** Verify in browser using dev-browser skill
+- **UI stories:** Verify in browser using `$codex-browser`
 - **Backend stories:** Verify endpoint returns expected response
 - **Migration stories:** Verify column/table exists after migration
 ```
@@ -365,7 +365,7 @@ The PRD will be executed by Codex. Therefore:
    D. Other: [specify]
 
 5. For UI stories, what story-specific checks?
-   A. Verify in browser using dev-browser skill
+   A. Verify in browser using `$codex-browser`
    B. Playwright e2e test per story
    C. Both A and B
    D. No story-level checks needed
@@ -393,7 +393,7 @@ General codebase checks that run ONCE when all stories are done:
 - `bun lint` — linting passes with zero warnings
 
 ### Story-Level (checked per story)
-- **UI stories:** Verify in browser using dev-browser skill
+- **UI stories:** Verify in browser using `$codex-browser`
 
 ## User Stories
 
@@ -415,7 +415,7 @@ Mark each item [x] as you complete it. Only close when all are checked.
 - [ ] Define dark palette with gray tones (not pure black) in theme constants file
 - [ ] Ensure sufficient contrast ratios (WCAG AA) — check with contrast calculator
 - [ ] Colors defined for all UI states: default, selected, hover, disabled
-- [ ] Verify in browser using dev-browser skill
+- [ ] Verify in browser using `$codex-browser`
 
 Mark each item [x] as you complete it. Only close when all are checked.
 
@@ -428,7 +428,7 @@ Mark each item [x] as you complete it. Only close when all are checked.
 - [ ] Detail panels use theme colors (verify in browser)
 - [ ] Progress bar uses theme colors (verify in browser)
 - [ ] Dialogs use theme colors (verify in browser)
-- [ ] Verify in browser using dev-browser skill
+- [ ] Verify in browser using `$codex-browser`
 
 Mark each item [x] as you complete it. Only close when all are checked.
 
@@ -439,7 +439,7 @@ Mark each item [x] as you complete it. Only close when all are checked.
 - [ ] Theme option visible in settings view
 - [ ] Changes apply immediately without restart (verify visually)
 - [ ] Changes persist to the application config file
-- [ ] Verify in browser using dev-browser skill
+- [ ] Verify in browser using `$codex-browser`
 
 Mark each item [x] as you complete it. Only close when all are checked.
 

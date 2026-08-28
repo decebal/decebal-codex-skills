@@ -1,4 +1,0 @@
-interface:
-  display_name: "Skill Creator"
-  short_description: "Help with Skill Creator tasks"
-  default_prompt: "Use $skill-creator to apply its workflow to this request."

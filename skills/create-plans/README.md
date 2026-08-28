@@ -150,11 +150,13 @@ Skill works fine without them - proceeds with general planning. But tasks will b
 
 ### Creating a Domain Skill
 
-Domain skills are created with the [skill-creator](../skill-creator/) skill.
+Domain skills in this repository are created with the
+[codex-skill-development](../codex-skill-development/) skill.
 
 **Process:**
 
-1. Invoke `$skill-creator` → choose "Build a new skill"
+1. Invoke `$codex-skill-development`; it composes official `$skill-creator`
+   with repository validation and installability gates
 2. Name: `build-[your-domain]`
 3. Description: "Build [framework/platform] apps. Full lifecycle - build, debug, test, optimize, ship."
 4. Ask it to create exhaustive references covering:
