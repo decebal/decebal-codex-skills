@@ -44,8 +44,9 @@ demonstrate.
 
 Three growth loops now share one evidence model:
 
-- `$codex-seo` routes installed SEO specialists and provides a bounded fallback
-  without inventing crawl, ranking, traffic, or performance data.
+- `$codex-seo` routes installed SEO specialists and ships a safe Rust core for
+  page audits, sitemap checks, and migration drift without inventing crawl,
+  ranking, traffic, or performance data.
 - `$app-store-optimization` audits Apple and Google listings, composes existing
   SEO skills, and ships Rust metadata and experiment checks.
 - `$skill-autoresearch` runs capped skill experiments against a frozen evaluator,
@@ -113,7 +114,7 @@ mean “configured for your codebase.”
 | Skill and plugin metadata | Enforced in the same workflow | Every skill frontmatter file, `agents/openai.yaml`, and plugin manifest passes repository validation |
 | `codex-guard` | Real binary smoke-tested | Argument parsing and representative allow, rewrite, and deny outcomes work outside unit tests |
 | Five config-driven gates | Run against a hostile fixture | Layer, forbidden-pattern, authority, attribution, and test-script gates catch known violations |
-| Skill behavior | Four installable runtimes tested in CI | `blog-image`, `web-video`, `skill-autoresearch`, and `app-store-optimization` pass executable tests; this is not a claim that all 55 skills have behavioral tests |
+| Skill behavior | Five installable runtimes tested in CI | `blog-image`, `web-video`, `skill-autoresearch`, `codex-seo`, and `app-store-optimization` pass executable tests; this is not a claim that all 55 skills have behavioral tests |
 | Remaining gates | Reusable, opt-in | Binaries and tests ship here; adopters must configure paths and invoke them from CI or hooks |
 
 [`gates/gates.toml`](gates/gates.toml) is a worked example for a Rust and
@@ -180,6 +181,7 @@ cargo test --manifest-path gates/rust/Cargo.toml --workspace
 cargo run --manifest-path gates/rust/Cargo.toml -p skill-metadata-check -- \
   --skills-dir skills --plugin-manifest .codex-plugin/plugin.json
 cargo test --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml
+cargo test --locked --manifest-path skills/codex-seo/scripts/Cargo.toml
 cargo test --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml
 bash tests/run.sh
 ```

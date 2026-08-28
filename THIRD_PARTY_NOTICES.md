@@ -22,3 +22,12 @@ Repository also includes a modified, Rust-first port derived from
 
 That directory remains MIT licensed and carries upstream copyright in
 `LICENSE.txt` plus detailed changes in `NOTICE.md`.
+
+Repository also includes a modified, Rust-first port derived from
+[`AgriciDaniel/claude-seo`](https://github.com/AgriciDaniel/claude-seo):
+
+- `skills/codex-seo/`
+
+That directory remains MIT licensed and carries upstream copyright in
+`LICENSE.txt`, a capability migration ledger, and detailed changes in
+`NOTICE.md`.

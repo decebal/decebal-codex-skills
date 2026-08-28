@@ -1,6 +1,6 @@
 {
   "name": "decebal-codex-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "55 Codex skills, Rust runtimes and gates, guides, hooks, and engineering rules.",
   "author": {
     "name": "Decebal Dobrica",

@@ -1,0 +1,47 @@
+[workspace]
+members = ["."]
+resolver = "2"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+rust_2018_idioms = { level = "warn", priority = -1 }
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+bare_urls = "deny"
+
+[package]
+name = "codex-seo"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "Safe static SEO evidence collector for the codex-seo skill"
+
+[dependencies]
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls"] }
+roxmltree = "0.21"
+scraper = "0.27"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "2"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "codex-seo"
+path = "src/main.rs"
+
+[lints]
+workspace = true

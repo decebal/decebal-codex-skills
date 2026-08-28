@@ -1,71 +1,140 @@
 ---
 name: codex-seo
-description: Coordinate evidence-led SEO audits, page reviews, technical checks, content analysis, schema work, GEO, local SEO, and planning in Codex. Use when asked to audit or improve search visibility, choose among installed seo specialist skills, or produce a prioritized SEO action plan without fabricating crawl, ranking, performance, or traffic data.
+description: Audit, plan, and improve technical SEO, on-page content, structured data, sitemaps, hreflang, local or ecommerce visibility, and AI-search citability using evidence-first Codex workflows and a safe Rust static-analysis CLI. Use for SEO audits, page reviews, traffic or ranking investigations, content plans, schema, crawlability, indexation, migration drift, competitor research, and GEO. Never invent search, analytics, backlink, or performance data.
 ---
 
 # Codex SEO
 
-Route SEO work to available specialist skills, then combine evidence into one
-decision-ready result. This skill is an original compatibility layer; it does
-not bundle any third-party SEO suite.
+Run evidence-led SEO work in Codex. Combine installed specialist skills with a
+safe Rust static-analysis core.
 
-## Route first
+## Evidence rules
 
-Inspect skills available in current Codex context.
+Label every material claim:
 
-1. If `$seo` exists, use it as primary orchestrator.
-2. For a narrow request, invoke matching installed specialist directly. Common
-   routes include `$seo-technical`, `$seo-content`, `$seo-schema`, `$seo-page`,
-   `$seo-performance`, `$seo-images`, `$seo-sitemap`, `$seo-geo`, `$seo-local`,
-   `$seo-hreflang`, `$seo-backlinks`, and `$seo-plan`.
-3. If requested specialist is missing, continue with fallback below. State
-   missing capability once; do not pretend its API, crawler, or dataset ran.
+- **Observed** — directly present in fetched HTML, headers, structured data,
+  supplied exports, screenshots, or tool output.
+- **Inferred** — reasoned from observed evidence. State assumptions.
+- **Setup required** — needs credentials, a connector, a browser session, field
+  performance data, search results, or another unavailable source.
 
-Do not install, execute, or copy code from an external SEO repository unless
-user explicitly requests that separate action and its license permits it.
+Never invent rankings, impressions, clicks, backlinks, Core Web Vitals, crawl
+coverage, or competitor metrics. Never present static inspection as proof of
+indexation or real-user performance.
 
-## Scope audit
+## Compose installed skills
 
-Clarify target only when repository or URL cannot be inferred. Choose smallest
-useful mode:
+Use `$seo` as broad orchestrator when installed. Route focused work to matching
+`$seo-*` specialists such as technical, content, schema, sitemap, hreflang,
+performance, local, ecommerce, competitor, programmatic, SXO, or GEO.
 
-- **Page review:** one URL or rendered page.
-- **Technical review:** crawl/indexing, canonical, robots, sitemap, redirects,
-  status codes, rendering, performance evidence.
-- **Content review:** intent coverage, structure, originality, entities, internal
-  links, and passage-level citability.
-- **Structured data:** detected JSON-LD and schema eligibility; validation still
-  requires an authoritative validator.
-- **Plan:** prioritized actions from already-collected evidence.
+Use this skill's Rust CLI for deterministic page, sitemap, and drift checks.
+Keep specialist reasoning and live-data collection in Codex. Do not install
+third-party suites unless user asks.
 
-For broad audits, start with page and technical evidence. Add specialist areas
-only when target type and available data justify them.
+## Choose mode
 
-## Fallback workflow
+Read [references/audit-playbooks.md](references/audit-playbooks.md) only for
+requested mode:
 
-When no SEO suite is installed:
+- full audit
+- single-page review
+- technical audit
+- content or on-page review
+- schema, sitemap, or hreflang review
+- local or ecommerce review
+- competitor, topic cluster, or programmatic plan
+- migration drift
+- AI-search or GEO review
 
-1. Read user-provided repository files or open requested public pages.
-2. Capture direct evidence: response behavior, rendered headings and copy,
-   metadata, links, robots directives, canonical, sitemap references, and
-   structured data visible in source or browser state.
-3. Browse current search-engine documentation for claims that may have changed.
-   Prefer official Google, Bing, Schema.org, and web-platform sources.
-4. Separate findings into `observed`, `inferred`, and `not checked`.
-5. Rank fixes by impact, confidence, effort, and dependency order.
+Read [references/migration-ledger.md](references/migration-ledger.md) when
+checking upstream compatibility or deciding whether work belongs in Rust,
+specialist skills, or setup-required integrations.
 
-Never invent keyword volume, rankings, backlinks, traffic, Core Web Vitals field
-data, index coverage, or competitor performance. Mark each as `setup required`
-unless direct evidence exists.
+## Collect evidence
 
-## Output contract
+1. Confirm target, scope, locale, audience, business goal, and comparison
+   baseline when relevant.
+2. Fetch only URLs user placed in scope. For local files, pass explicit
+   `--base-url` when relative links matter.
+3. Use browser, current official documentation, and connected APIs when live
+   evidence matters.
+4. Preserve source URLs and collection time.
+5. Treat robots directives, canonical tags, schema, and sitemap entries as
+   signals, not guarantees of search-engine behavior.
 
-Return:
+## Run Rust core
 
-1. target and audit mode;
-2. evidence sources and collection time;
-3. critical findings with exact page, file, selector, header, or artifact;
-4. prioritized actions with expected outcome and verification step;
-5. limits, unmeasured areas, and required integrations.
+From repository root:
 
-Avoid generic SEO checklists when evidence supports fewer, sharper findings.
+```bash
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- audit --input https://example.com --format markdown
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- audit --input ./page.html --base-url https://example.com/page --format json
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- sitemap --input https://example.com/sitemap.xml --format markdown
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- drift --baseline before.json --current after.json --format markdown
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- doctor
+```
+
+Installed skill path may differ. Resolve `scripts/Cargo.toml` relative to this
+`SKILL.md`.
+
+Exit code `0` means command completed without high or critical findings. Exit
+code `2` means audit completed and found high or critical findings.
+
+Rust core:
+
+- reads local HTML and XML or public HTTP(S) targets;
+- blocks loopback, private, link-local, multicast, documentation, and other
+  special-use network destinations;
+- revalidates each redirect and pins validated DNS results;
+- disables ambient proxies and credential forwarding;
+- caps redirects, response size, and request time;
+- audits titles, descriptions, headings, robots, canonicals, links, images,
+  language, Open Graph, and JSON-LD;
+- validates sitemap structure and URL scope;
+- compares JSON audit snapshots for migration drift.
+
+Rust core does not execute JavaScript, authenticate to analytics or search
+platforms, crawl arbitrary sites recursively, measure field performance, or
+mutate external systems.
+
+## Analyze mechanisms
+
+Prioritize causes over symptom counts:
+
+- discovery and crawl path;
+- indexability and canonical consistency;
+- rendering and content availability;
+- intent alignment and information gain;
+- internal-link graph and orphan risk;
+- structured-data eligibility;
+- localization and hreflang graph integrity;
+- media delivery and layout stability;
+- conversion path and search-experience quality;
+- citation-ready passages for AI answer systems.
+
+Explain dependencies. Example: a missing canonical plus conflicting sitemap URL
+is one consolidation problem, not two unrelated checklist items.
+
+## Return result
+
+Use this structure:
+
+1. **Scope and evidence** — targets, tools, date, inaccessible sources.
+2. **Executive diagnosis** — strongest mechanisms and business impact.
+3. **Findings** — evidence, severity, confidence, affected URLs, fix, validation.
+4. **Prioritized plan** — now, next, later; owner and dependency when known.
+5. **Setup required** — exact connector, credential, export, or measurement
+   needed for unsupported claims.
+6. **Verification** — command, re-crawl, browser check, or platform report that
+   proves each fix.
+
+Keep recommendations specific enough to implement. Include exact tags, URLs,
+schema types, internal-link targets, or content changes when evidence supports
+them.
+
+## Attribution
+
+Workflow adapted from
+[AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo).
+See [NOTICE.md](NOTICE.md) and [LICENSE.txt](LICENSE.txt).

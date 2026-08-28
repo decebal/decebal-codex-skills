@@ -21,6 +21,7 @@ jobs:
           components: rustfmt, clippy
           cache-workspaces: |
             skills/skill-autoresearch/scripts
+            skills/codex-seo/scripts
             skills/app-store-optimization/scripts
 
       # web-video skill needs ffmpeg/ffprobe.
@@ -42,6 +43,9 @@ jobs:
           cargo fmt --manifest-path skills/skill-autoresearch/scripts/Cargo.toml --all --check
           cargo clippy --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml --all-targets -- -D warnings
           cargo test --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml
+          cargo fmt --manifest-path skills/codex-seo/scripts/Cargo.toml --all --check
+          cargo clippy --locked --manifest-path skills/codex-seo/scripts/Cargo.toml --all-targets -- -D warnings
+          cargo test --locked --manifest-path skills/codex-seo/scripts/Cargo.toml
           cargo fmt --manifest-path skills/app-store-optimization/scripts/Cargo.toml --all --check
           cargo clippy --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml --all-targets -- -D warnings
           cargo test --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml

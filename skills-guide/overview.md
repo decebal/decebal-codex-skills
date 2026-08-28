@@ -34,11 +34,11 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 |-------|---------|-----------------|
 | **codex-beads** | Convert PRDs to executable beads; auto-detects the tracker CLI (cn/br/bd) | "create beads", "convert prd to beads" |
 
-### Search & Growth
+### SEO
 
 | Skill | Purpose | Trigger Phrases |
 |-------|---------|-----------------|
-| **codex-seo** | Route evidence-led SEO audits and installed specialists | "SEO audit", "improve search visibility" |
+| **codex-seo** | Audit SEO with installed specialists and a safe Rust static-analysis core | "SEO audit", "improve search visibility" |
 | **app-store-optimization** | Audit Apple/Google listings with Rust metadata and experiment checks | "ASO audit", "optimize app listing", "store metadata" |
 
 ### Engineering Quality
