@@ -1017,7 +1017,9 @@ fn parse_options(args: &[String]) -> Result<BTreeMap<String, String>, String> {
         return Err("every option requires one value".to_owned());
     }
     let mut values = BTreeMap::new();
-    for pair in args.chunks_exact(2) {
+    let (pairs, remainder) = args.as_chunks::<2>();
+    debug_assert!(remainder.is_empty());
+    for pair in pairs {
         if !pair[0].starts_with("--") {
             return Err(format!("unexpected positional argument {:?}", pair[0]));
         }
