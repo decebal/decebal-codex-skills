@@ -18,6 +18,8 @@ Documentation, reusable skills, configuration examples, and Rust quality gates f
 cargo fmt --manifest-path gates/rust/Cargo.toml --all --check
 cargo clippy --manifest-path gates/rust/Cargo.toml --workspace --all-targets -- -D warnings
 cargo test --manifest-path gates/rust/Cargo.toml --workspace
+cargo test --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml
+cargo test --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml
 ```
 
 Also run plugin and skill validation described in `README.md`.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Autoresearch"
+  short_description: "Optimize skills with measured Rust loops"
+  default_prompt: "Use $skill-autoresearch to improve this skill with a frozen evaluator and bounded experiments."

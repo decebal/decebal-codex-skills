@@ -1,5 +1,9 @@
 # Local Chronis event store
 .chronis/
 
+# Local autoresearch state and Rust build outputs
+.autoresearch/
+target/
+
 # macOS metadata
 .DS_Store

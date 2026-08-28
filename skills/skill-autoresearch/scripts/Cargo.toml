@@ -1,0 +1,17 @@
+[package]
+name = "skill-autoresearch"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "Bounded experiment runner for Codex skill autoresearch"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "skill-autoresearch"
+path = "src/main.rs"
+
+[lints.rust]
+unsafe_code = "forbid"

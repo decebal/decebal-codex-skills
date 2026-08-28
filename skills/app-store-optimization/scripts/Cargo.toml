@@ -1,0 +1,20 @@
+[package]
+name = "aso-lint"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+description = "App Store and Google Play metadata validator"
+
+[dependencies]
+serde_json = "1"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "aso-lint"
+path = "src/main.rs"
+
+[lints.rust]
+unsafe_code = "forbid"

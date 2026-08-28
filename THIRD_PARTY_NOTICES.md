@@ -14,3 +14,11 @@ evaluation workflows.
 
 Repository-level MIT license applies to original material and modifications only
 where compatible with upstream terms. It does not replace third-party licenses.
+
+Repository also includes a modified, Rust-first port derived from
+[`alirezarezvani/claude-code-aso-skill`](https://github.com/alirezarezvani/claude-code-aso-skill):
+
+- `skills/app-store-optimization/`
+
+That directory remains MIT licensed and carries upstream copyright in
+`LICENSE.txt` plus detailed changes in `NOTICE.md`.

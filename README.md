@@ -4,7 +4,7 @@
 [![skill tests](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml/badge.svg)](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**52 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
+**55 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
 making agent work repeatable, reviewable, and harder to fake.**
 
 Prompts guide behavior. Compiled checks cover failures prose does not prevent:
@@ -34,13 +34,22 @@ demonstrate.
 
 | Layer | Contents | Use it for |
 |---|---|---|
-| Skills | 52 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, deployment, media, and review |
+| Skills | 55 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
 | Portable rules | 15 focused [`rules/`](rules/) with incidents and exceptions | Selecting instruction fragments worth carrying into another codebase |
 | Quality gates | 21-crate Rust workspace under [`gates/rust/`](gates/rust/) | Turning selected rules into fast, testable failures |
 | Hooks and policy | [`hooks/README.md`](hooks/README.md), [`configs/hooks.json`](configs/hooks.json), and [`configs/default.rules`](configs/default.rules) | Reviewing lifecycle guardrails and execution-policy examples before adoption |
 | Distribution | [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) | Packaging the collection as a skills-only Codex plugin |
+
+Three growth loops now share one evidence model:
+
+- `$codex-seo` routes installed SEO specialists and provides a bounded fallback
+  without inventing crawl, ranking, traffic, or performance data.
+- `$app-store-optimization` audits Apple and Google listings, composes existing
+  SEO skills, and ships Rust metadata and experiment checks.
+- `$skill-autoresearch` runs capped skill experiments against a frozen evaluator,
+  keeps strict improvements, and records every result in TSV.
 
 ## Quick start
 
@@ -104,7 +113,7 @@ mean “configured for your codebase.”
 | Skill and plugin metadata | Enforced in the same workflow | Every skill frontmatter file, `agents/openai.yaml`, and plugin manifest passes repository validation |
 | `codex-guard` | Real binary smoke-tested | Argument parsing and representative allow, rewrite, and deny outcomes work outside unit tests |
 | Five config-driven gates | Run against a hostile fixture | Layer, forbidden-pattern, authority, attribution, and test-script gates catch known violations |
-| Skill behavior | Two scripts tested in CI | `blog-image` and `web-video` pass executable tests; this is not a claim that all 52 skills have behavioral tests |
+| Skill behavior | Four installable runtimes tested in CI | `blog-image`, `web-video`, `skill-autoresearch`, and `app-store-optimization` pass executable tests; this is not a claim that all 55 skills have behavioral tests |
 | Remaining gates | Reusable, opt-in | Binaries and tests ship here; adopters must configure paths and invoke them from CI or hooks |
 
 [`gates/gates.toml`](gates/gates.toml) is a worked example for a Rust and
@@ -152,7 +161,7 @@ See [`skills-guide/codex-workflow.md`](skills-guide/codex-workflow.md) and
 
 ```text
 .
-├── skills/          52 reusable Codex skills
+├── skills/          55 reusable Codex skills
 ├── gates/           Rust gates, hook glue, fixtures, and adoption guide
 ├── rules/           portable instruction fragments
 ├── templates/       AGENTS.md starters by project shape
@@ -170,6 +179,8 @@ cargo clippy --manifest-path gates/rust/Cargo.toml --workspace --all-targets -- 
 cargo test --manifest-path gates/rust/Cargo.toml --workspace
 cargo run --manifest-path gates/rust/Cargo.toml -p skill-metadata-check -- \
   --skills-dir skills --plugin-manifest .codex-plugin/plugin.json
+cargo test --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml
+cargo test --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml
 bash tests/run.sh
 ```
 

@@ -1,7 +1,7 @@
 {
   "name": "decebal-codex-skills",
-  "version": "1.0.0",
-  "description": "Codex skills, guides, configuration, hooks, and engineering quality gates.",
+  "version": "1.1.0",
+  "description": "55 Codex skills, Rust runtimes and gates, guides, hooks, and engineering rules.",
   "author": {
     "name": "Decebal Dobrica",
     "url": "https://github.com/decebal"
@@ -9,12 +9,12 @@
   "homepage": "https://github.com/decebal/decebal-codex-skills",
   "repository": "https://github.com/decebal/decebal-codex-skills",
   "license": "MIT",
-  "keywords": ["codex", "agent-skills", "engineering", "rust", "chronis"],
+  "keywords": ["codex", "agent-skills", "engineering", "rust", "chronis", "seo", "aso", "autoresearch"],
   "skills": "./skills/",
   "interface": {
     "displayName": "Decebal Codex Skills",
     "shortDescription": "Engineering workflows and quality gates for Codex.",
-    "longDescription": "A curated collection of Codex skills, Chronis workflows, project templates, lifecycle-hook examples, and Rust quality gates.",
+    "longDescription": "A curated collection of Codex skills, Chronis workflows, SEO and ASO workflows, Rust autoresearch and quality gates, project templates, and lifecycle-hook examples.",
     "developerName": "Decebal Dobrica",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Write"],
@@ -22,7 +22,8 @@
     "defaultPrompt": [
       "Show skills relevant to this repository.",
       "Create a PRD and track it with Chronis.",
-      "Run engineering quality checks on this change."
+      "Run engineering quality checks on this change.",
+      "Audit search and app-store visibility with measured evidence."
     ]
   }
 }

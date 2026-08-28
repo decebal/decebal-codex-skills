@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex SEO"
+  short_description: "Route evidence-led SEO work safely"
+  default_prompt: "Use $codex-seo to audit this target and return evidence-backed SEO priorities."

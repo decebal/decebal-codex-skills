@@ -15,6 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7.0.1
 
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
+          cache-workspaces: |
+            skills/skill-autoresearch/scripts
+            skills/app-store-optimization/scripts
+
       # web-video skill needs ffmpeg/ffprobe.
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
@@ -28,3 +36,12 @@ jobs:
 
       - name: Run skill tests
         run: bash tests/run.sh
+
+      - name: Check Rust skill runtimes
+        run: |
+          cargo fmt --manifest-path skills/skill-autoresearch/scripts/Cargo.toml --all --check
+          cargo clippy --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml --all-targets -- -D warnings
+          cargo test --locked --manifest-path skills/skill-autoresearch/scripts/Cargo.toml
+          cargo fmt --manifest-path skills/app-store-optimization/scripts/Cargo.toml --all --check
+          cargo clippy --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml --all-targets -- -D warnings
+          cargo test --locked --manifest-path skills/app-store-optimization/scripts/Cargo.toml

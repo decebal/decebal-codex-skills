@@ -34,6 +34,13 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 |-------|---------|-----------------|
 | **codex-beads** | Convert PRDs to executable beads; auto-detects the tracker CLI (cn/br/bd) | "create beads", "convert prd to beads" |
 
+### Search & Growth
+
+| Skill | Purpose | Trigger Phrases |
+|-------|---------|-----------------|
+| **codex-seo** | Route evidence-led SEO audits and installed specialists | "SEO audit", "improve search visibility" |
+| **app-store-optimization** | Audit Apple/Google listings with Rust metadata and experiment checks | "ASO audit", "optimize app listing", "store metadata" |
+
 ### Engineering Quality
 
 | Skill | Purpose | Trigger Phrases |
@@ -62,6 +69,7 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 |-------|---------|-----------------|
 | **find-skills** | Discover & install new skills | "find a skill for X", "how do I do X" |
 | **codex-skill-development** | Repository skill authoring with Codex gates | "create a repository skill" |
+| **skill-autoresearch** | Improve skills through frozen evals and bounded Rust experiment loops | "autoresearch this skill", "optimize skill" |
 
 ## Skill Locations
 
@@ -78,6 +86,9 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 ├── mcp-builder -> ~/.agents/skills/mcp-builder
 ├── codex-beads -> ~/.agents/skills/codex-beads
 ├── codex-prd -> ~/.agents/skills/codex-prd
+├── codex-seo -> ~/.agents/skills/codex-seo
+├── app-store-optimization -> ~/.agents/skills/app-store-optimization
+├── skill-autoresearch -> ~/.agents/skills/skill-autoresearch
 ├── rust-clean-architecture -> ~/.agents/skills/rust-clean-architecture
 ├── rust-quality -> ~/.agents/skills/rust-quality
 ├── integration-test -> ~/.agents/skills/integration-test
