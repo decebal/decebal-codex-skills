@@ -28,7 +28,7 @@ jobs:
       run:
         working-directory: gates/rust
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
 
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
