@@ -1,0 +1,4 @@
+interface:
+  display_name: "Forge Prove It"
+  short_description: "Forge a repo-calibrated prove-it reviewer"
+  default_prompt: "Use $forge-prove-it to census this repository's enforcement surface and write a prove-it reviewer calibrated to it."
