@@ -70,6 +70,7 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 | **find-skills** | Discover & install new skills | "find a skill for X", "how do I do X" |
 | **codex-skill-development** | Repository skill authoring with Codex gates | "create a repository skill" |
 | **skill-autoresearch** | Improve skills through frozen evals and bounded Rust experiment loops | "autoresearch this skill", "optimize skill" |
+| **forge-prove-it** | Census this repo's gates, then write it a calibrated prove-it reviewer | "generate a prove-it", "give this repo a feature reviewer" |
 
 ## Skill Locations
 
@@ -104,7 +105,8 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 ├── explain-module -> ~/.agents/skills/explain-module
 ├── perf-review -> ~/.agents/skills/perf-review
 ├── wasm-development -> ~/.agents/skills/wasm-development
-└── protobuf-grpc -> ~/.agents/skills/protobuf-grpc
+├── protobuf-grpc -> ~/.agents/skills/protobuf-grpc
+└── forge-prove-it -> ~/.agents/skills/forge-prove-it
 ```
 
 ## Installing Skills
