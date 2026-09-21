@@ -38,7 +38,66 @@ caught much later. Prevent it:
   dead branch. It fails **open** when `gh` is unavailable (CI/headless), so local
   dev — where the mistake actually happens — is always guarded.
 
+## One PR = one commit, merged by rebase
+
+**A PR reaches the trunk as exactly ONE commit, and the forge is set to
+rebase-merge.** Not squash-merge, not a merge commit.
+
+The payoff is not a tidy log. It is that **the commit that lands is the commit
+that was reviewed and tested** — same tree, same message, same content. A squash
+merge invents a new commit that nobody ran anything against, and that invention
+is what makes every ancestry check downstream lie (next section). Rebase-merging
+a single commit deletes that entire class of problem instead of working around
+it.
+
+- **Keep the branch at one commit as you work.** Amend as you go, or collapse
+  before review:
+  ```bash
+  git reset --soft "$(git merge-base origin/<trunk> HEAD)"
+  git commit -F <message-file>
+  ```
+  Reset to the **merge-base**, never to a commit count. `HEAD~11` silently
+  swallows whatever the trunk merged in, and a branch that merged the trunk
+  twice has more parents than subjects.
+- **Prove the collapse lost nothing:** `git diff <old-head> HEAD` must be
+  **empty**. The empty diff is the evidence. A commit count is not.
+- **Then `git push --force-with-lease`** — never bare `--force`. The lease
+  refuses when the remote moved under you, which is precisely the case where a
+  force push destroys work that is not yours.
+- **Set the forge to rebase-merge and turn the other two off**, so the merge
+  button enforces this and nobody has to remember it.
+- **Re-run the gates afterwards.** The squashed commit is a new SHA carrying no
+  status; whatever was green belonged to the head you just replaced.
+
+### The carve-out, stated exactly
+
+History rewriting stays banned, with one narrow opening:
+
+| Rewriting | Allowed? |
+|---|---|
+| Your own feature branch, unmerged, no one else's commits on it | **Yes** — amend and collapse freely, `--force-with-lease` |
+| A branch carrying commits by another person or session | **No.** Ask them — their reflog is the only copy |
+| The trunk | **No** |
+| A branch whose PR already merged | **No** — it is dead; branch fresh |
+
+Check, never assume. A second name here means stop:
+
+```bash
+git log --format='%an' "$(git merge-base origin/<trunk> HEAD)"..HEAD | sort -u
+```
+
+**The cost, 2026-09-21.** A PR sat at 11 commits, two of them trunk merges.
+Collapsing it by hand meant resetting to the merge-base — `HEAD~11` would have
+eaten both merges — and the standing "never rewrite shared history" line made a
+routine request read as forbidden, costing a round-trip to establish that a
+single-author unmerged branch was never what that ban was for. Both halves are
+now written down.
+
 ## Squash merges break every ancestry check
+
+Everything below is what you live with when the forge squash-merges. It is the
+reason for the section above; where rebase-merge of one commit is in force, most
+of it stops applying.
 
 A squash merge replaces a branch's commits with one new-SHA commit. Everything
 that reasons about ancestry then lies:
@@ -75,8 +134,11 @@ that reasons about ancestry then lies:
   your files by name.
 - **Local name = remote name.** `git push -u origin $(git branch --show-current)`.
   Never `git push origin local:different-remote`.
-- **Never rewrite shared history** — no `--force`, no `--amend` on pushed commits,
-  no interactive rebase on a published branch.
+- **Never rewrite history that is not yours** — no bare `--force` ever, and no
+  rewriting of the trunk, of a merged branch, or of a branch carrying someone
+  else's commits. Collapsing **your own unmerged** branch to one commit and
+  pushing it with `--force-with-lease` is expected, not an exception: see
+  [One PR = one commit](#one-pr--one-commit-merged-by-rebase).
 - **Never `git stash`.** Use a branch.
 - **Never run destructive git on uncommitted work** — no `git checkout <ref> -- <path>`,
   no `git restore`, no `git reset --hard`. Use `git show` / `git diff` to READ
@@ -108,6 +170,12 @@ same inherited, already-merged branch.
   a piped push reports the **pipe's** status, not git's.
 - **Claim a task before starting it** in whatever tracker you use; the claim is
   the signal to other agents that the work is taken.
+- **The collapse to one commit is the ORCHESTRATOR's, once, at the end.** While
+  siblings are still pushing to a shared branch, nobody squashes, amends or
+  force-pushes it — a rewrite mid-flight deletes commits that were pushed
+  between your fetch and your push, and `--force-with-lease` will not save you
+  because your lease is current. Agents append; the orchestrator collapses after
+  the last one reports.
 
 ## Conventional commits
 
@@ -132,8 +200,12 @@ enforces this on source only.
 
 ## Clean commit history
 
-- **One logical change per commit.** Don't bundle unrelated fixes.
-- **The build must pass at every commit.**
+- **One logical change per PR, and that PR is one commit.** Don't bundle
+  unrelated fixes — an unrelated fix is a different PR, not a second commit.
+  Work-in-progress commits on the branch are fine and expected; they are
+  collapsed before review, not shipped.
+- **The build must pass at the commit that merges.** With one commit per PR
+  that is the only commit there is.
 - **Don't commit others' work** — `git add` your files by name.
 - **Don't commit unless explicitly asked.** Leave changes for review.
 - **Commit in the FOREGROUND, verify it landed, THEN push.** Never background or
@@ -152,7 +224,11 @@ enforces this on source only.
   invisible: nothing shows it isn't merging, and work silently accumulates
   off-trunk — half of how the 61-commit pile-up happened. Once a feature branch
   has its first pushed commit, open the PR. If a branch reaches ~5 commits with no
-  PR, stop and open one.
+  PR, stop and open one — those are work-in-progress commits, and they are
+  collapsed before review, not before the PR exists.
+- **A PR is not ready while its branch has more than one commit.** Collapse to
+  one, re-run the gates on the new SHA, then mark it ready. See
+  [One PR = one commit](#one-pr--one-commit-merged-by-rebase).
 - **One feature = one PR.** Never stack a PR on an open PR's branch.
 - **Size is never a reason to split or pause.** See
   [definition-of-done.md](definition-of-done.md).

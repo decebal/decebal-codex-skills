@@ -38,6 +38,58 @@ The worst test is not a failing one. Watch for:
 Each is an absence wearing a green badge — see
 [evidence-discipline.md](evidence-discipline.md).
 
+## On a gate failure, go GRANULAR — never re-run the same wide gate
+
+Gates run in sequence, so **the first one to fail hides every gate behind it.**
+A timeout hides them worst of all: the run was killed, so it reported nothing
+about the checks it never reached.
+
+**Never conclude "my change is clean" from a TIMEOUT.** It is the weakest signal
+there is. And never answer a gate failure by re-running the same wide gate — you
+learn one gate per attempt, each costing a full cycle.
+
+Instead, drop to the smallest checks that can fail, and run them **cheapest and
+most-discriminating first**:
+
+1. **The ratchets and text-scan tests** — size caps, layer boundaries, banned
+   imports, id references. Seconds once warm, and they fail with a *sentence*
+   rather than a stack.
+2. **The scoped unit tests** for the crate or package you touched.
+3. **The lint pass** for that package.
+4. Only then the whole-workspace compile gates.
+
+That is the reverse of most hooks' own order, which puts the ten-minute compiles
+first — so the cheap check that would have named your defect in three seconds
+never runs.
+
+**"Seconds once warm" is a concession — ask why a scan needs a compiler at all.**
+A ratchet that only reads source text has no inherent build dependency. It
+*inherits* one by being packaged as a compiled test, and then it cannot run until
+the test targets build — which puts the cheapest, most discriminating check in
+the repo **behind** the slowest gates. That is this section's own inversion, made
+structural rather than accidental, and reordering the hook cannot fix it.
+
+Measured: a text scan for a banned credential filename — a string list matched
+against file contents, no compilation required — failed in **8.2s** and named the
+defect in one sentence. Because it lived in the compiled architecture binary it
+ran only after two gates had each burned 300s and been killed, and after a cold
+workspace test build. The defect was a string in a file written an hour earlier.
+
+So package a source-text check as a script the no-compile phase runs, beside the
+format and banned-id scans, not as a test. The general form of this question is
+in [timeouts.md](timeouts.md) — including the requirement to prove that moving a
+check's phase did not change its verdicts.
+
+**A build command is not a test run.** `cargo check`, `clippy`, and any
+`--no-run` / build-only invocation COMPILE an assertion without EXECUTING it. A
+whole class of gate — the architecture ratchet, the size cap — is invisible to
+all three, so "it compiles" is not evidence they pass. Invoke the test binary.
+
+The measured case: three pushes failed `TIMEOUT (>300s)` on three *different*
+compile gates. The real defect was one line added to a re-export, which pushed a
+file from 500 to 501 lines and tripped a size ratchet that ran *after* all three
+— and that never executed. `check`, `clippy` and `--no-run` had all passed.
+
 ## Process-per-test beats a global serial flag
 
 Running each test in its own process structurally isolates the process-global state
