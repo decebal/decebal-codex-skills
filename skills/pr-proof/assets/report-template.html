@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REPLACE — the claim in four words</title>
+<style>
+  :root{color-scheme:light;--paper:#f5f4ef;--ink:#18342e;--muted:#586963;--line:#ced7ce;--panel:#fff;--green:#17694e;--green-bg:#e9f4ed;--amber:#785015;--amber-bg:#fff3d9;--red:#973e32;--red-bg:#fcebe7;--radius:12px;--mono:ui-monospace,SFMono-Regular,Consolas,monospace}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:0 28px}
+  a{color:var(--green);text-underline-offset:3px}
+  a:focus-visible,summary:focus-visible,button:focus-visible{outline:3px solid var(--green);outline-offset:2px}
+  .skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:12px;top:12px;background:#fff;padding:10px;z-index:50}
+  header{padding:54px 0 10px}
+  h1{font-size:40px;line-height:1.15;margin:0 0 14px}
+  .eyebrow{font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  h2{font-size:25px;line-height:1.25;margin:0 0 14px}
+  h3{font-size:17px;margin:26px 0 8px}
+  code{font:12px/1.4 var(--mono);padding:2px 4px;background:#eef0eb;border-radius:3px;overflow-wrap:anywhere}
+  pre{margin:0;font:12px/1.65 var(--mono);background:#12241f;color:#dbeae3;padding:16px 18px;border-radius:9px;overflow-x:auto}
+  pre .del{color:#f0a89b;display:block}pre .add{color:#8fd3ad;display:block}
+  pre .ctx{color:#9ab3aa;display:block}pre .hdr{color:#7f9d93;display:block}
+  .tag{display:inline-block;font:600 11px var(--mono);letter-spacing:.05em;padding:3px 8px;border-radius:999px}
+  .tag.good{background:var(--green-bg);color:var(--green)}
+  .tag.bad{background:var(--red-bg);color:var(--red)}
+  .tag.warn{background:var(--amber-bg);color:var(--amber)}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  .ba>div{display:flex;flex-direction:column;gap:10px}
+  .ba h4{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;gap:9px;align-items:center;margin:0}
+  .copy{position:relative;margin:12px 0}
+  .copy button.cp{position:absolute;top:8px;right:8px;font:600 11px var(--mono);padding:5px 10px;border:1px solid #2f4a42;border-radius:6px;background:#1b332c;color:#cfe3da;cursor:pointer}
+  .copy button.cp.done{background:var(--green);border-color:var(--green);color:#fff}
+  figure{margin:0 0 22px}
+  figure img{width:100%;height:auto;border:1px solid var(--line);border-radius:9px;display:block}
+  figcaption{font-size:13px;line-height:1.6;color:var(--muted);padding-top:11px}
+  .capture-gap{border:1px dashed #aabbb0;border-radius:9px;min-height:180px;padding:26px;background:#eef1eb;display:flex;flex-direction:column;justify-content:center}
+  .step{display:grid;grid-template-columns:38px 1fr;gap:14px;padding:18px 0;border-top:1px solid var(--line)}
+  .step .n{font:700 15px var(--mono);color:var(--green)}
+  .pass{background:var(--green-bg);border-left:3px solid var(--green);padding:10px 14px;margin-top:10px;font-size:14px}
+  details{border:1px solid var(--line);background:var(--panel);border-radius:8px;margin-top:12px}
+  summary{cursor:pointer;padding:15px;font-weight:650;font-size:14px}
+  details>div{padding:0 18px 18px;font-size:14px}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  footer{padding:28px 0 50px;color:var(--muted);font-size:12px}
+  @media(max-width:850px){.wrap{padding:0 18px}.ba{grid-template-columns:1fr}h1{font-size:31px}}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  @media print{.skip{display:none}body{background:#fff}details>div{display:block}figure,.step,table{break-inside:avoid}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="wrap">
+  <p class="eyebrow">PR #NNN · REPO · YYYY-MM-DD</p>
+  <!-- 1. THE CLAIM. One sentence naming the end-to-end thing a person can now
+       do. Falsifiable. Not "improves X". -->
+  <h1>REPLACE — what a person can now do that they could not before.</h1>
+  <p>One short paragraph: who this is for, and the single job it completes.</p>
+</header>
+
+<main id="main">
+
+<section class="wrap">
+  <!-- 2. BEFORE / AFTER. Behaviour first. Code only where the code IS the point.
+       Both panels labelled with a real SHA — "before" without one is
+       unverifiable. -->
+  <p class="eyebrow">01 / Before and after</p>
+  <h2>REPLACE — a claim about what changed, not "Changes".</h2>
+  <div class="ba">
+    <div>
+      <h4><span class="tag bad">Before</span> <code>BASE_SHA</code></h4>
+      <pre><span class="hdr">path/to/surface</span>
+<span class="ctx">what the person saw, or the line that ran</span>
+<span class="del">the behaviour that was wrong</span></pre>
+    </div>
+    <div>
+      <h4><span class="tag good">After</span> <code>HEAD_SHA</code></h4>
+      <pre><span class="hdr">path/to/surface</span>
+<span class="ctx">what the person saw, or the line that ran</span>
+<span class="add">the behaviour now</span></pre>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <!-- 3. WHAT A PERSON ACTUALLY SEES. Real running product only — never a mock,
+       a fixture harness or a dev-server page. Caption carries provenance. -->
+  <p class="eyebrow">02 / What a person actually sees</p>
+  <h2>REPLACE — name the surface and the moment.</h2>
+
+  <figure id="shot-1">
+    <a href="assets/SLUG/shot-1.png"><img src="assets/SLUG/shot-1.png"
+       alt="Factual description of what is on screen, for someone who cannot see it." loading="lazy"></a>
+    <figcaption><strong>PID 00000 · window 0000 · DD Month, HH:MM:SS UTC.</strong>
+      Captured from <code>path/to/the/binary</code>, profile/tenant NAME.</figcaption>
+  </figure>
+
+  <!-- A capture you could NOT take goes here, visibly. Never omit it silently:
+       omission reads as "nothing to see", the gap reads as "not established". -->
+  <figure>
+    <div class="capture-gap">
+      <span class="tag warn">Not captured</span>
+      <h3 style="margin:12px 0 6px">REPLACE — what is missing.</h3>
+      <p style="margin:0;font-size:14px;color:var(--muted)">Why it could not be captured, and what would be needed.</p>
+    </div>
+  </figure>
+</section>
+
+<section class="wrap">
+  <!-- 4. PROVE IT YOURSELF. Every command verified to exist THIS session.
+       data-copy and the <pre> must be byte-identical. One command per block.
+       Every step ends in an observable Pass. -->
+  <p class="eyebrow">03 / Prove it yourself</p>
+  <h2>REPLACE — the shortest path to seeing it work.</h2>
+
+  <div class="step">
+    <span class="n">1</span>
+    <div>
+      <h3 style="margin-top:0">REPLACE — what this step establishes.</h3>
+      <div class="copy"><button class="cp" data-copy="the exact command">Copy</button><pre>the exact command</pre></div>
+      <p class="pass"><strong>Pass:</strong> an observable outcome. Never "looks right".</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">2</span>
+    <div>
+      <h3 style="margin-top:0">REPLACE — the click-through, if there is one.</h3>
+      <p>Named menus and buttons, in order.</p>
+      <p class="pass"><strong>Pass:</strong> the observable end state.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <!-- 5. TRAPS. Failure modes that look like this change and are not. -->
+  <p class="eyebrow">04 / Traps</p>
+  <h2>REPLACE — the things that will look like this change and are not.</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Its tell</th><th>What it actually is</th></tr></thead>
+    <tbody>
+      <tr><td>REPLACE</td><td>REPLACE</td><td>REPLACE</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="wrap">
+  <!-- 6. WHAT THIS PROVES THAT THE TESTS CANNOT. If you cannot fill this, you
+       did not need a report — write Markdown instead. -->
+  <p class="eyebrow">05 / What this proves that the tests cannot</p>
+  <h2>REPLACE — the gap between green and working.</h2>
+  <p>Name what no gate observes on this path, and what the screenshots settle that an assertion cannot.</p>
+
+  <details>
+    <summary>Superseded captures and long output</summary>
+    <div>
+      <p>Only secondary or replaced evidence belongs in here. Never the claim, never the limits, never a failure.</p>
+    </div>
+  </details>
+</section>
+
+<section class="wrap">
+  <!-- 7. WHAT I HAVE NOT CHECKED. Always present. Always last. Never softened,
+       never collapsed. A report without this is marketing. -->
+  <p class="eyebrow">06 / Limits</p>
+  <h2>What I have NOT checked.</h2>
+  <ul>
+    <li>REPLACE — a platform, a path, a tenant, a role you did not exercise.</li>
+    <li>REPLACE — anything a gate covers only by compiling, not by running.</li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="wrap">Written for PR #NNN. Committed in the branch; not a hosted page.</footer>
+
+<script>
+  document.querySelectorAll("button.cp").forEach((b) => {
+    b.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy);
+      } catch {
+        // Clipboard permission can be refused; select the text so it stays copyable by hand.
+        const r = document.createRange();
+        r.selectNodeContents(b.parentElement.querySelector("pre"));
+        const s = getSelection();
+        s.removeAllRanges();
+        s.addRange(r);
+        return;
+      }
+      const was = b.textContent;
+      b.textContent = "Copied";
+      b.classList.add("done");
+      setTimeout(() => { b.textContent = was; b.classList.remove("done"); }, 1400);
+    });
+  });
+</script>
+</body>
+</html>

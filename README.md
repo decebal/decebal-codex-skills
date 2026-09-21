@@ -34,7 +34,7 @@ demonstrate.
 
 | Layer | Contents | Use it for |
 |---|---|---|
-| Skills | 56 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
+| Skills | 57 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
 | Portable rules | 15 focused [`rules/`](rules/) with incidents and exceptions | Selecting instruction fragments worth carrying into another codebase |
@@ -152,8 +152,14 @@ $codex-beads
     ↓ epic, tasks, dependencies, verification checklist
 cn ready → cn claim → implement → verify → cn done
     ↓
-git history + CI result + Chronis history
+$pr-proof
+    ↓ the claim, before/after by SHA, screenshots with provenance, and the limits
+git history + CI result + Chronis history + a report a reviewer can read
 ```
+
+A green CI result says the code compiles and the assertions pass. It has never
+demonstrated a feature, which is the gap `$pr-proof` and
+[`rules/pr-evidence-report.md`](rules/pr-evidence-report.md) close.
 
 See [`skills-guide/codex-workflow.md`](skills-guide/codex-workflow.md) and
 [`skills-guide/chronis-git-best-practices.md`](skills-guide/chronis-git-best-practices.md).
@@ -162,7 +168,7 @@ See [`skills-guide/codex-workflow.md`](skills-guide/codex-workflow.md) and
 
 ```text
 .
-├── skills/          56 reusable Codex skills
+├── skills/          57 reusable Codex skills
 ├── gates/           Rust gates, hook glue, fixtures, and adoption guide
 ├── rules/           portable instruction fragments
 ├── templates/       AGENTS.md starters by project shape
