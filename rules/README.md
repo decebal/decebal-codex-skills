@@ -24,6 +24,8 @@ the next agent under deadline; a prohibition with a cost attached does not.
 | [event-streams.md](event-streams.md) | Activity vs Alerts, strictly separated |
 | [ui-remote-states.md](ui-remote-states.md) | Never render a raw payload; plain-English copy; `ready` / `empty` / `unreachable` as a type |
 | [data-over-binary.md](data-over-binary.md) | Fix customer behaviour in published data, not in the shipped binary |
+| [pr-evidence-report.md](pr-evidence-report.md) | The HTML report a PR ships: seven sections claim→evidence→limits, screenshots with provenance, SHA-anchored before/after, copy blocks with a Pass line, what may be collapsed |
+| [documents-not-artifacts.md](documents-not-artifacts.md) | Deliverables are versioned, indexed documents under `docs/`; never hosted artifact pages |
 
 ## How to use them
 
@@ -55,10 +57,13 @@ policy; those files use `prefix_rule(...)`, not Markdown.
 
 ## Picking a subset
 
-Don't take all fifteen. Context is the budget.
+Don't take all seventeen. Context is the budget.
 
 - **Any repo, any stack:** `git-discipline`, `evidence-discipline`, `comments`,
-  `definition-of-done`, `token-efficiency`.
+  `definition-of-done`, `token-efficiency`, `documents-not-artifacts`.
+- **Ships user-visible change through PRs:** add `pr-evidence-report` — the
+  report is the only place a reviewer sees the feature work, since no gate
+  demonstrates behaviour.
 - **Multi-agent work:** add `agent-parallelism`, `timeouts`.
 - **Has a test suite and hooks:** add `testing-gates`.
 - **Layered backend:** add `layer-boundaries`, `dependency-hygiene`.
