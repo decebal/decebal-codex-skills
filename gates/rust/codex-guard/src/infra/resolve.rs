@@ -23,6 +23,7 @@
 use super::classify::{cached, classify, Verdict, INFRA_TOOL_RE, MUTATE_RE, READONLY_RE};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
+use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 
 /// One thing a chain reaches.
@@ -104,7 +105,13 @@ impl Limits {
 pub fn sha256_hex(text: &str) -> String {
     let mut h = Sha256::new();
     h.update(text.as_bytes());
-    format!("{:x}", h.finalize())
+    // `hybrid_array::Array`, which digest 0.11 returns, implements no `LowerHex`.
+    let digest = h.finalize();
+    let mut out = String::with_capacity(digest.len() * 2);
+    for byte in digest.iter() {
+        let _ = write!(out, "{byte:02x}");
+    }
+    out
 }
 
 /// Every wrapper reference in a block of text, deduped and ordered.
