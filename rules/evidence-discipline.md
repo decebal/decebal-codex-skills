@@ -74,8 +74,16 @@ a runtime fact you did not just read, stop and read it.
   or archived copy — do NOT conclude "no records exist". Find the live path and
   read it directly.
 - **File size means nothing for a write-ahead-log-backed store.** A 0-byte
-  database file with the data in adjacent segment files is normal. Read the
-  segments.
+  database file with the data in adjacent segment files is normal. The data is
+  in the segments — read them through the store's engine.
+- **Read a store through its own engine, never around it.** Its query tool, or a
+  tool in the repo's language built on the store's own library. Never an ad-hoc
+  engine (`duckdb`) or a script (`python`) over its files, and never
+  `strings`/`grep` over its log. Those skip what the engine owns, such as the
+  unfolded log tail and the schema. If the store's tool cannot answer the
+  question, build the missing tool. A real hand-check session began with duckdb
+  folds over an event store's parquet, and the user stopped it: "develop new
+  tools for it if you don't have what you need".
 - **Fold the history to get current state.** Reading one record and stopping gives
   you a moment, not the value. Last-writer-wins by timestamp.
 - **Don't assert cause from a code path you skimmed — confirm which condition
