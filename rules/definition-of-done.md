@@ -18,7 +18,10 @@ convenient milestone.
 - **Discovered work is in scope.** Work you find while building (a follow-on, a
   missing layer, a gap) is part of THIS feature's completeness — finish it here. Do
   not spin it out into a separate task so you can declare the current one "done".
-  Scope grows to whatever end-to-end actually needs.
+  Scope grows to whatever end-to-end actually needs. A red check the PR
+  inherited from trunk is discovered work: fix it in the same PR unless the user
+  explicitly says otherwise. See [git-discipline.md § One open PR per
+  session](git-discipline.md#one-open-pr-per-session).
 - **A block is not a stopping point — route around it.** If one slice is blocked on
   something outside your control (an upstream library not yet released, another
   team, a credential), exhaust every alternative path to end-to-end before

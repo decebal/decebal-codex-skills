@@ -13,20 +13,9 @@ DEFECT gets repaired.
 
 When a customer-facing output is wrong there are two possible repair sites, and the
 binary is almost always the wrong one. **Default to publishing a new data version.**
-Data is instant, per-tenant, and it teaches the model the rule once. A patch in the
-connector is one field, on one tenant's path, in something that has to be built,
-shipped and installed.
+Data is instant, per-tenant, and it teaches the model the rule once.
 
-The measured case. A partner API rejected `Online` where it wants `online`, and the
-instinct was `.to_lowercase()` in the connector. But the published mapping said
-`onlinestatus ← payload.online_status` — a **pass-through** — and nothing in the
-chain ever stated the acceptable values. Normalising in the binary repairs that one
-field while the model still does not know the contract, so the two sibling fields
-declared as bare `"type": "string"` fail identically and each needs its own shipped
-patch.
-
-Of the five bugs found that day, **four were data fixes and one was
-infrastructure. None were app code.**
+**Detail:** `~/.codex/rules-reference/data-over-binary-case.md` — the `Online`/`online` case where the binary fix solved one field while sibling failures recurred (4 data fixes, 1 infrastructure, 0 app code).
 
 ## Triage order — in sequence, before proposing any fix
 

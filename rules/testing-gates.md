@@ -41,8 +41,6 @@ Each is an absence wearing a green badge — see
 ## On a gate failure, go GRANULAR — never re-run the same wide gate
 
 Gates run in sequence, so **the first one to fail hides every gate behind it.**
-A timeout hides them worst of all: the run was killed, so it reported nothing
-about the checks it never reached.
 
 **Never conclude "my change is clean" from a TIMEOUT.** It is the weakest signal
 there is. And never answer a gate failure by re-running the same wide gate — you
@@ -52,160 +50,20 @@ Instead, drop to the smallest checks that can fail, and run them **cheapest and
 most-discriminating first**:
 
 1. **The ratchets and text-scan tests** — size caps, layer boundaries, banned
-   imports, id references. Seconds once warm, and they fail with a *sentence*
-   rather than a stack.
+   imports, id references. Seconds once warm.
 2. **The scoped unit tests** for the crate or package you touched.
 3. **The lint pass** for that package.
 4. Only then the whole-workspace compile gates.
 
-That is the reverse of most hooks' own order, which puts the ten-minute compiles
-first — so the cheap check that would have named your defect in three seconds
-never runs.
-
-**"Seconds once warm" is a concession — ask why a scan needs a compiler at all.**
-A ratchet that only reads source text has no inherent build dependency. It
-*inherits* one by being packaged as a compiled test, and then it cannot run until
-the test targets build — which puts the cheapest, most discriminating check in
-the repo **behind** the slowest gates. That is this section's own inversion, made
-structural rather than accidental, and reordering the hook cannot fix it.
-
-Measured: a text scan for a banned credential filename — a string list matched
-against file contents, no compilation required — failed in **8.2s** and named the
-defect in one sentence. Because it lived in the compiled architecture binary it
-ran only after two gates had each burned 300s and been killed, and after a cold
-workspace test build. The defect was a string in a file written an hour earlier.
-
-So package a source-text check as a script the no-compile phase runs, beside the
-format and banned-id scans, not as a test. The general form of this question is
-in [timeouts.md](timeouts.md) — including the requirement to prove that moving a
-check's phase did not change its verdicts.
-
 **A build command is not a test run.** `cargo check`, `clippy`, and any
-`--no-run` / build-only invocation COMPILE an assertion without EXECUTING it. A
-whole class of gate — the architecture ratchet, the size cap — is invisible to
-all three, so "it compiles" is not evidence they pass. Invoke the test binary.
+`--no-run` invocation COMPILE without EXECUTING. The architecture ratchet and size cap are invisible to all three.
 
-The measured case: three pushes failed `TIMEOUT (>300s)` on three *different*
-compile gates. The real defect was one line added to a re-export, which pushed a
-file from 500 to 501 lines and tripped a size ratchet that ran *after* all three
-— and that never executed. `check`, `clippy` and `--no-run` had all passed.
+**Detail:** `~/.codex/rules-reference/testing-gates-detail.md` — the phase-ordering incident (8.2s text scan vs 300s timeouts + cold build) and why a source scan has no inherent build dependency.
 
-## Process-per-test beats a global serial flag
+## Process-per-test, sharding, and test authoring
 
-Running each test in its own process structurally isolates the process-global state
-that suites usually serialize for: `$HOME` mutation, in-process singletons,
-projection caches, `OnceLock`-style statics. Adopting a process-per-test runner let
-a ~2,900-test suite drop `--test-threads=1` as a blanket requirement and run fully
-in parallel.
+**Detail:** `~/.codex/agent-rules/testing-authoring.md` (`codex-guard rule-scope` delivers it the first time a session touches a test file) — process-per-test isolation, CI sharding strategy, test file conventions, un-hangable test patterns, module mock factories.
 
-- **Keep a hang guard.** A per-test slow-timeout that flags at 60s and
-  **TERMINATES and names** the test at 120s ends unbounded multi-minute hangs.
-- **Serialize only what is genuinely machine-global** — the OS keychain is the
-  classic one, since process-per-test cannot isolate it. Put those tests in one
-  named group with `max-threads = 1`. Everything else runs parallel.
-- **Existing `#[serial]`-style annotations are harmless** under process-per-test and
-  keep the fallback runner working. Don't bulk-remove them.
-- **Check whether your runner runs doctests.** Many do not. If you add a runnable
-  doctest, add an explicit step for it — otherwise it is silently skipped.
+See that file when working on test authoring; it arrives only once a session touches test files or gate configs.
 
-## Shard in CI, run whole locally
-
-Compile the test binaries **once** into an archive, then fan the archive out across
-runners with a deterministic partition (`hash:i/N`). The aggregate check is green
-only if every shard is.
-
-**A test group must never split across machines** — a group serializes only within
-one process-set. Run the whole group on ONE shard and EXCLUDE it from the
-partitions. If your config expresses that in more than one place (the group
-override plus each profile's default filter), say so in the file: adding one
-group-member test then means updating all of them.
-
-Coverage runs as a single, deliberately **unsharded** instrumented pass.
-
-## Tests must be un-hangable
-
-A test that blocks on a real socket accept/connect, or a real thread sleep, with no
-bound can hang forever — one such test burned **~40 minutes** of CI as a zombie
-binary thrashing the build lock. Two backstops:
-
-- **Runtime** — the runner's per-test slow-timeout terminates and names it.
-- **Authoring** — `gates/sh/check-test-hangs.sh` FAILS when a test file introduces
-  a real socket `bind`/`connect` or a thread sleep without an inline allow-marker.
-
-The convention:
-
-1. **Drive I/O code over an in-memory duplex pipe** — no socket, no port, no
-   browser. A framed IPC protocol plus its auth handshake round-trips fine over a
-   `duplex` pair.
-2. **Test time-based logic under virtual time** (`start_paused`, fake timers) —
-   asserting "one ping per 20s interval" then takes microseconds. Never a real
-   wall-clock sleep.
-3. **Bound every blocking await** in a timeout, or join the task inside a bounded
-   window, so a leak times out instead of hanging.
-
-```rust
-// GOOD — in-memory transport, no real socket
-let (client, server) = tokio::io::duplex(4096);
-let (s_read, s_write) = tokio::io::split(server);
-let task = tokio::spawn(async move { handle_conn(s_read, s_write, state).await });
-// … write a frame over `client`, assert the reply. `task.abort()` at the end.
-
-// GOOD — virtual time, never a real sleep
-#[tokio::test(start_paused = true)]
-async fn keepalive_ticks_once_per_interval() {
-    tokio::time::sleep(Duration::from_secs(20)).await; // advances instantly
-    assert_eq!(pings.load(Ordering::SeqCst), 1);
-}
-
-// BAD — real socket accept with no timeout: hangs forever if no peer connects
-#[tokio::test]
-async fn accepts_a_connection() {
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
-    let (sock, _) = listener.accept().await.unwrap(); // ⛔ unbounded
-}
-```
-
-**Allowlist** only when the socket *itself* is the unit under test (ECONNREFUSED,
-port-in-use, real HTTP framing). Keep it bounded — async gets a timeout, a sync mock
-server gets an ephemeral `127.0.0.1:0` plus `set_read_timeout` so a leaked accept
-thread can't wedge the box — and mark the line:
-
-```rust
-// test-hang-allow: ephemeral 127.0.0.1:0 one-shot mock; accept thread has
-// set_read_timeout(2s), leaked thread dies with the process.
-let listener = TcpListener::bind("127.0.0.1:0").unwrap();
-```
-
-## Module mocks need a complete-surface factory
-
-Some test runners register module mocks **globally and persistently**: a mock
-registered by one file stays active for every file that runs after it. A *partial*
-mock (`{ addToast }` when the real module also exports `notify`, `celebrate`, …)
-makes any later-running file that imports a missing export crash with
-`SyntaxError: Export named 'X' not found` — an order-dependent failure that is green
-locally and red in CI.
-
-Rules, worth gating:
-
-1. Module mocking may appear **only** in test files.
-2. The factory must provide the module's **complete export surface** — either a
-   shared `make*Mock()` helper kept next to the tests, or a spread of the real
-   module:
-   ```ts
-   const real = await import("@scope/ui")
-   mock.module("@scope/ui", () => ({ ...real, SOME_ID: stub }))
-   ```
-3. Never pass a bare partial object literal.
-
-Adding a mock for a new module means adding a `make<Name>Mock()` covering every
-runtime export.
-
-## Test file conventions
-
-- **No new inline `#[cfg(test)] mod tests` blocks.** Put unit tests in a sibling
-  `foo_tests.rs` or `foo/tests.rs`, integration tests in `tests/`. Grandfather the
-  existing ones in a closed allowlist and migrate on touch.
-- **Scope the pre-push run to the changed modules**; let CI run the whole suite.
-- **Detect comment-only diffs and skip the compile gates** —
-  `gates/rust/rust-effective-diff` exits 1 when a change is
-  comment/doc/whitespace-only.
+**In brief:** running each test in its own process isolates process-global state. Shard in CI, run whole locally. No new inline `#[cfg(test)] mod tests` blocks.

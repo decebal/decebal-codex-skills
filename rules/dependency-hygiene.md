@@ -1,3 +1,12 @@
+---
+paths:
+  - "**/Cargo.toml"
+  - "**/Cargo.lock"
+  - "**/package.json"
+  - "**/bun.lock"
+  - "**/deny.toml"
+---
+
 # Dependency hygiene
 
 The dependency graph is a build-time and stability cost. Keep it small and

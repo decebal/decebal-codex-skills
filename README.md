@@ -37,9 +37,9 @@ demonstrate.
 | Skills | 58 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
-| Portable rules | 15 focused [`rules/`](rules/) with incidents and exceptions | Selecting instruction fragments worth carrying into another codebase |
+| Portable rules | 21 focused [`rules/`](rules/) with incidents and exceptions; file-type rules carry `paths:` and reach a session through `codex-guard rule-scope` | Selecting instruction fragments worth carrying into another codebase |
 | Quality gates | 21-crate Rust workspace under [`gates/rust/`](gates/rust/) | Turning selected rules into fast, testable failures |
-| Hooks and policy | [`hooks/README.md`](hooks/README.md), [`configs/hooks.json`](configs/hooks.json), and [`configs/default.rules`](configs/default.rules) | Reviewing lifecycle guardrails and execution-policy examples before adoption |
+| Hooks and policy | [`hooks/README.md`](hooks/README.md), [`configs/hooks.json`](configs/hooks.json), and [`configs/default.rules`](configs/default.rules) | Reviewing lifecycle guardrails (blast radius, one open PR per session, prompt numbers, path-scoped rules, comments) and execution-policy examples (no trunk push, no `--no-verify`) before adoption |
 | Distribution | [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json) | Packaging the collection as a skills-only Codex plugin |
 
 Three growth loops now share one evidence model:

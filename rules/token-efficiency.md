@@ -3,24 +3,24 @@
 Rule form, for inclusion in a project's agent instructions. Deep dive:
 [../docs/token-efficiency.md](../docs/token-efficiency.md).
 
-- **Targeted searches first** — grep/glob with specific patterns instead of reading
-  whole files. Read only the relevant sections with `offset`/`limit`. If grep
-  misses, try glob for file patterns. A full file read is the last resort.
-- **No `sed`/`awk`/`cat`/`head`/`tail` for reading** — use the file-read tool with
-  `offset`/`limit`, never a shell text dump into context. For inline edits use the
-  edit tool, not `sed -i`. If you must pipe a large command's output, filter it to
-  errors and warnings.
+- **Targeted searches first** — `rg` with specific patterns instead of reading
+  whole files. Read only the relevant line range. If `rg` misses, try
+  `rg --files` for file patterns. A full file read is the last resort.
+- **No whole-file dumps** — never `cat` a large file into context. Print a
+  bounded range (`sed -n '120,180p' <file>`) or the `rg -n` hits. For edits use
+  `apply_patch`, not `sed -i`. If you must pipe a large command's output, filter
+  it to errors and warnings.
 - **Cache mentally** — don't re-read files you've already seen this session.
   Reference line numbers from prior reads. Retain: file structure, exports,
   function signatures, import patterns, config values.
 - **Concise responses** — state what you'll do, do it, report the result.
 - **Batch parallel calls** — read 3 independent files in one message, not three.
-  Run grep and glob together.
+  Run independent searches together.
 - **Scope strictly** — only what was asked. No added comments, docstrings, or
   refactors to code you didn't change. No speculative improvements. Fewer lines
   changed = fewer tokens on review.
-- **Minimal diffs** — prefer a small `old_string` edit over rewriting a file. Never
-  rewrite a file to change 3 lines.
+- **Minimal diffs** — prefer a small `apply_patch` hunk over rewriting a file.
+  Never rewrite a file to change 3 lines.
 
 ## Output filtering (optional tooling)
 

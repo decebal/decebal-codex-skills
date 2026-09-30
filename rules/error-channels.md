@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{svelte,ts,tsx,js,jsx}"
+---
+
 # Error channels — two, never one
 
 Every catch block routes to exactly one of two functions. Never a bare
