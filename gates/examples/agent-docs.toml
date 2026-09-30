@@ -12,7 +12,11 @@ rules = [
 
 # Rule fragments are embedded in output because Codex does not expand Markdown
 # `@` imports. Relative paths resolve from renderer working directory.
-rules_dir = "rules"
+# `.agents/rules` is a directory `codex-guard rule-scope` reads, so a rule here
+# whose frontmatter has `paths:` is listed by name, not inlined, and rule-scope
+# delivers it when a call touches a matching file. From a directory rule-scope
+# does not read, every rule is inlined.
+rules_dir = ".agents/rules"
 
 # Repository-specific stack, commands, and boundaries append after shared rules.
 overlay = "docs/agent-overlay.md"
@@ -20,3 +24,10 @@ overlay = "docs/agent-overlay.md"
 [targets.agents]
 path  = "AGENTS.md"
 title = "AGENTS.md — Acme instructions"
+# Codex stops reading the project AGENTS.md chain at project_doc_max_bytes
+# (32768 by default) and only logs a warning. `--check` fails a target over
+# this cap. Quoted, because the manifest reader takes strings only.
+max_bytes = "32768"
+
+# ~/.codex/AGENTS.md takes its own manifest in ~/.codex, with its own overlay
+# and max_bytes = "0": see rules/README.md.

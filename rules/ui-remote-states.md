@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{svelte,ts,tsx,js,jsx}"
+---
+
 # UI: honest states and honest copy
 
 Three rules that regress in every codebase, each with the incident that produced
@@ -51,37 +56,12 @@ Three facts, kept apart, because a reader acts on each differently:
 | The screen knows | State | Affordance |
 |---|---|---|
 | We asked, here is the answer | `ready` | the content |
-| We asked, the answer is authoritatively nothing | `empty` | **no retry, ever.** Name who can change it, third person. A re-check is allowed only where the answer can change without the reader acting (an admin granting access in another window) |
+| We asked, the answer is authoritatively nothing | `empty` | **no retry, ever.** Name who can change it, third person. A re-check is allowed only where the answer can change without the reader acting |
 | We could not ask, so we do not know | `unreachable` | **a retry, always.** It RE-FETCHES — never `location.reload()`, which in a desktop webview tears down the whole app to fix one panel |
 
-Collapsing the last two is the defect. A shipped build showed *"Your courses will
-appear here once it can reach the server again"* over an empty list. Nothing
-re-checked. The sentence promised a recovery the code never performed, and there
-was no control to trigger one.
+**Detail:** `~/.codex/rules-reference/ui-remote-states-patterns.md` — the incident, RemoteState<T> type with compile errors in both directions, hand-rolled state gates.
 
-**Make the type the enforcement.** Put `RemoteState<T>` and its renderer in the one
-package every consumer depends on, so shared components receive the state and each
-adapter constructs it:
-
-```ts
-type RemoteState<T> =
-  | { kind: "ready"; data: T }
-  | { kind: "empty"; message: string; actor: string; recheck?: () => void; recovery?: never }
-  | { kind: "unreachable"; message: string; recovery: { label: string; retry: () => void } }
-```
-
-- Omitting the recovery on `unreachable` is a **compile error** — `recovery` is
-  required.
-- Putting a retry on an authoritative `empty` is a **compile error** too —
-  `recovery` is typed `never`. Both directions on purpose: made only-one-way,
-  authors relabel an empty as unreachable to satisfy the compiler.
-
-**Back it with a gate** for components that hand-roll their own `error` flag and
-never adopt the type: `gates/ts/check-remote-recovery.ts` fails on a failure branch
-whose body offers the reader nothing. It deliberately never reads an **empty**
-branch — whether "nothing is turned on" deserves a button is the semantic call the
-type carries, and a gate that guessed would be wrong in the direction that adds
-impossible actions, which rule 2 forbids.
+**Make the type the enforcement** so the type system prevents the "courses" mistake: build states with `remoteUnreachable()` / `remoteEmpty()` and render with `<RemoteDeadEnd state={…} />`.
 
 ## The meta-rule
 

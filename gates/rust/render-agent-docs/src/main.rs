@@ -14,23 +14,40 @@
 //! overlay   = "docs/agent-overlay.md"   # this repo's own stack, commands, boundaries
 //!
 //! [targets.agents]
-//! path  = "AGENTS.md"
-//! title = "AGENTS.md — Acme instructions"
+//! path      = "AGENTS.md"
+//! title     = "AGENTS.md — Acme instructions"
+//! max_bytes = "32768"                   # quoted: the manifest holds strings
 //! ```
 //!
 //! `--check` is the gate. Wire it into the pre-push hook: a target edited by
 //! hand, or a rule added to the manifest and never rendered, fails the push
 //! instead of drifting quietly.
 //!
-//! Exit 0 = written, or (under `--check`) every target current.
-//! Exit 1 = a target is stale. Exit 2 = the manifest could not be used.
+//! `max_bytes` defaults to 32768, Codex's `project_doc_max_bytes`; `"0"` means
+//! no cap, for `~/.codex/AGENTS.md`, which Codex reads whole. Codex applies the
+//! limit to the whole root-to-cwd chain of AGENTS.md files, so this per-file
+//! check is a floor, not the full check. Writing an over-cap target warns;
+//! `--check` fails on it.
+//!
+//! A rule whose frontmatter has `paths:` is listed by name instead of inlined
+//! when `rules_dir` is a directory `codex-guard rule-scope` reads
+//! (`.agents/rules`, `.claude/rules`, `$CODEX_HOME/agent-rules`); rule-scope
+//! then delivers it when a call touches a matching file. From any other
+//! directory it is inlined, with a warning, because nothing else would deliver
+//! it. `~/` expands in `rules_dir`, `overlay` and target paths.
+//!
+//! Exit 0 = written, or (under `--check`) every target current and within cap.
+//! Exit 1 = a target is stale or over its cap. Exit 2 = the manifest could not
+//! be used.
 
 use gates_config::Config;
-use std::path::Path;
+use std::path::PathBuf;
 use std::process::ExitCode;
 
 mod render;
-use render::{load_rules, render, Manifest};
+use render::{
+    expand_home, is_path_scoped, load_rules, over_cap, render, rule_scope_reads, Manifest,
+};
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
@@ -49,7 +66,13 @@ fn main() -> ExitCode {
         }
     };
 
-    let manifest = Manifest::from_config(&cfg);
+    let manifest = match Manifest::from_config(&cfg) {
+        Ok(manifest) => manifest,
+        Err(e) => {
+            eprintln!("render-agent-docs: {manifest_path}: {e}");
+            return ExitCode::from(2);
+        }
+    };
     if manifest.targets.is_empty() {
         eprintln!("render-agent-docs: {manifest_path} declares no [targets.*]");
         return ExitCode::from(2);
@@ -67,7 +90,7 @@ fn main() -> ExitCode {
     // as a bare rules list would look like a successful run and silently delete
     // the repo's own instructions.
     let overlay = match &manifest.overlay {
-        Some(path) => match std::fs::read_to_string(path) {
+        Some(path) => match std::fs::read_to_string(expand_home(path)) {
             Ok(text) => Some(text),
             Err(e) => {
                 eprintln!("render-agent-docs: overlay {path}: {e}");
@@ -77,31 +100,60 @@ fn main() -> ExitCode {
         None => None,
     };
 
+    let codex_home = std::env::var_os("CODEX_HOME")
+        .map(PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".codex")));
+    let defer_scoped = rule_scope_reads(&expand_home(&manifest.rules_dir), codex_home.as_deref());
+    let scoped: Vec<&str> = rules
+        .iter()
+        .filter(|r| is_path_scoped(&r.text))
+        .map(|r| r.name.as_str())
+        .collect();
+    if !defer_scoped && !scoped.is_empty() {
+        eprintln!(
+            "render-agent-docs: warning: inlining path-scoped rules ({}) because codex-guard \
+             rule-scope does not read {}; move them to .agents/rules to deliver them on demand",
+            scoped.join(", "),
+            manifest.rules_dir
+        );
+    }
+
     let mut stale: Vec<String> = Vec::new();
+    let mut over: Vec<String> = Vec::new();
     for target in &manifest.targets {
-        let wanted = render(target, overlay.as_deref(), &rules);
-        let current = std::fs::read_to_string(&target.path).ok();
+        let wanted = render(target, overlay.as_deref(), &rules, defer_scoped);
+        let path = expand_home(&target.path);
+        let current = std::fs::read_to_string(&path).ok();
+        let cap = over_cap(target, &wanted);
 
         if check {
             if current.as_deref() != Some(wanted.as_str()) {
                 stale.push(target.path.clone());
             }
+            over.extend(cap);
             continue;
+        }
+        if let Some(message) = &cap {
+            eprintln!("render-agent-docs: warning: {message}");
         }
         if current.as_deref() == Some(wanted.as_str()) {
             println!("  = {} (unchanged)", target.path);
             continue;
         }
-        if let Some(dir) = Path::new(&target.path).parent() {
+        if let Some(dir) = path.parent() {
             if !dir.as_os_str().is_empty() {
                 let _ = std::fs::create_dir_all(dir);
             }
         }
-        if let Err(e) = std::fs::write(&target.path, &wanted) {
+        if let Err(e) = std::fs::write(&path, &wanted) {
             eprintln!("render-agent-docs: write {}: {e}", target.path);
             return ExitCode::from(2);
         }
         println!("  ✓ {}", target.path);
+    }
+
+    for message in &over {
+        eprintln!("render-agent-docs: {message}");
     }
 
     if !stale.is_empty() {
@@ -117,6 +169,9 @@ fn main() -> ExitCode {
              to point at a rules directory that never existed. Re-render:\n\
              \x20   render-agent-docs --manifest {manifest_path}"
         );
+        return ExitCode::from(1);
+    }
+    if !over.is_empty() {
         return ExitCode::from(1);
     }
     if check {

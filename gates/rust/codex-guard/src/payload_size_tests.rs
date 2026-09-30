@@ -10,6 +10,7 @@
 use crate::bash_hygiene;
 use crate::comment_hygiene;
 use crate::infra::{self, Decision};
+use crate::{pr_guard, prompt_number, rule_scope};
 use serde_json::json;
 
 /// Rough token estimate at 4 bytes per token, matching the shell script's `/4`.
@@ -75,6 +76,39 @@ fn a_confirmation_reason_stays_small() {
         panic!("expected an ask");
     };
     assert_under("infra-guard ask reason", &reason, 40);
+}
+
+#[test]
+fn the_prompt_number_refusal_names_the_fix_without_arguing_for_it() {
+    assert_under(
+        "prompt-number deny reason",
+        &prompt_number::reason(&["208".into()]),
+        70,
+    );
+}
+
+#[test]
+fn the_pr_guard_refusal_stays_a_paragraph() {
+    let open = pr_guard::OpenPr {
+        number: 1234,
+        title: "feat(widgets): a typical conventional title".into(),
+        head: "feat/widgets-typical".into(),
+    };
+    let trigger = pr_guard::Trigger::CreatePr {
+        repo: None,
+        head: None,
+        dry_run: false,
+    };
+    assert_under(
+        "pr-guard deny reason",
+        &pr_guard::reason("acme/widgets", &open, &trigger),
+        140,
+    );
+}
+
+#[test]
+fn rule_scope_adds_one_line_around_the_rules_it_delivers() {
+    assert_under("rule-scope header", rule_scope::HEADER, 25);
 }
 
 #[test]

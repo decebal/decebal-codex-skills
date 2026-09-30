@@ -7,6 +7,7 @@
 
 use serde_json::{json, Value};
 use std::io::Read;
+use std::path::{Component, Path, PathBuf};
 
 /// Read and parse the hook payload.
 ///
@@ -29,6 +30,27 @@ pub fn str_at<'a>(v: &'a Value, path: &[&str]) -> &'a str {
         }
     }
     cur.as_str().unwrap_or("")
+}
+
+/// `path` against the payload's `cwd`, with `.` and `..` folded lexically: a
+/// file a patch adds does not exist yet, so it cannot be canonicalised.
+pub fn resolve_path(cwd: &str, path: &str) -> PathBuf {
+    let joined = if Path::new(path).is_absolute() || cwd.is_empty() {
+        PathBuf::from(path)
+    } else {
+        Path::new(cwd).join(path)
+    };
+    let mut out = PathBuf::new();
+    for part in joined.components() {
+        match part {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                out.pop();
+            }
+            other => out.push(other),
+        }
+    }
+    out
 }
 
 /// `deny` — the tool call does not run, and the reason reaches the model.
@@ -74,14 +96,26 @@ pub fn rewrite_command(tool_input: &Value, command: &str) -> ! {
 /// Never a blocking exit: a block surfaces as an error the USER has to dismiss,
 /// for a finding only the assistant needs to act on.
 pub fn additional_context(context: &str) -> ! {
-    let out = json!({
+    println!("{}", context_output("PostToolUse", context));
+    std::process::exit(0)
+}
+
+/// Model context for a `PreToolUse` hook, with no decision: the call runs.
+///
+/// Codex marks a hook failed for `permissionDecision: "allow"` without
+/// `updatedInput`, so the key must be absent rather than set to allow.
+pub fn pre_tool_use_context(context: &str) -> ! {
+    println!("{}", context_output("PreToolUse", context));
+    std::process::exit(0)
+}
+
+pub fn context_output(event: &str, context: &str) -> Value {
+    json!({
         "hookSpecificOutput": {
-            "hookEventName": "PostToolUse",
+            "hookEventName": event,
             "additionalContext": context,
         }
-    });
-    println!("{out}");
-    std::process::exit(0)
+    })
 }
 
 /// Nothing to say. Exit 0, print nothing.

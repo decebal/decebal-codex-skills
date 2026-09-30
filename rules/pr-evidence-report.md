@@ -1,3 +1,10 @@
+---
+paths:
+  - "docs/**/*.html"
+  - "docs/**/assets/**"
+  - "**/.github/pull_request_template.md"
+---
+
 # The PR evidence report
 
 Portable. Assumes a repo with a `docs/` tree and a forge that renders links.
@@ -58,78 +65,25 @@ actually proven"*.
 
 ## Screenshots carry provenance or they prove nothing
 
-A screenshot with no provenance is a picture. The caption states **what
-produced it**: process id, window id, timestamp, which binary, which profile or
-tenant.
+A screenshot with no provenance is a picture. The caption states **what produced it**: process id, window id, timestamp, which binary, which profile or tenant.
 
-```html
-<figure id="shot-desktop">
-  <a href="assets/<slug>/desktop.png"><img src="assets/<slug>/desktop.png"
-     alt="<factual description of what is on screen>" loading="lazy"></a>
-  <figcaption><strong>PID 44555 · window 9215 · 19 September, 00:12:30 UTC.</strong>
-    Captured from the workspace's <code>target/debug/&lt;binary&gt;</code>.</figcaption>
-</figure>
-```
+**Detail:** `~/.codex/rules-reference/pr-evidence-report-examples.md` — HTML code samples (screenshot `<figure>`, before/after layout, copy blocks with fallback), CSS, accessibility requirements.
 
-- **`alt` describes the screen, not the intent.** It is read by someone who
-  cannot see it, and by you in six months.
+- **`alt` describes the screen, not the intent.**
 - **Assets go in `docs/<kind>/assets/<slug>/`**, beside the report, committed.
-- **A screenshot you could not take gets a visible gap**, never silence — a
-  bordered placeholder saying what is missing and why. Omitting it reads as
-  "nothing to see"; the gap reads as "not established", which is the truth.
-- **Never screenshot a mock, a fixture harness or a dev-server page and present
-  it as the product.** If the real surface could not be reached, that is a
-  capture gap.
+- **A screenshot you could not take gets a visible gap**, never silence.
+- **Never screenshot a mock, a fixture harness or a dev-server page.**
 
 ## Before / after is anchored to commits
 
-```html
-<div class="ba">
-  <div><h4><span class="tag bad">Before</span> <sha></h4><pre>…</pre></div>
-  <div><h4><span class="tag good">After</span> <sha></h4><pre>…</pre></div>
-</div>
-```
-
 The SHA is what makes it checkable. "Before" without one is a claim about the
-past that nobody can verify, and the past is exactly where a plausible-and-wrong
-story is cheapest to tell.
-
-Show **behaviour** before code. A user-visible before/after — the sentence that
-changed, the card that appeared — is worth more than a diff the reviewer can
-already read in the Files tab. Use the inline diff spans (`del` / `add` / `ctx`)
-only where the code IS the point.
+past that nobody can verify. Show **behaviour** before code. A user-visible before/after — the sentence that changed, the card that appeared — is worth more than a diff the reviewer can already read in the Files tab.
 
 ## Copy blocks: verbatim, one command, with a Pass line
 
-```html
-<div class="copy"><button class="cp" data-copy="<exact command>">Copy</button><pre><exact command></pre></div>
-```
-
-- **`data-copy` and the `<pre>` must be byte-identical.** They drift the moment
-  someone edits one, and the copied command then differs from the reviewed one.
 - **One command per block.** A reader pastes blocks; they do not parse them.
-- **Every step ends with `Pass:`** naming an observable outcome. "Looks right"
-  is not a criterion. "`tool_ready_connections=` lists your new server" is.
-- **Never fabricate a command.** Verify it exists this session. A runbook
-  sending someone to a task that was renamed costs more than no runbook.
-
-The button falls back to selecting the text when clipboard permission is
-refused, so the block is still usable:
-
-```js
-document.querySelectorAll("button.cp").forEach((b) => {
-  b.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(b.dataset.copy) }
-    catch {
-      const r = document.createRange()
-      r.selectNodeContents(b.parentElement.querySelector("pre"))
-      const s = getSelection(); s.removeAllRanges(); s.addRange(r); return
-    }
-    const was = b.textContent; b.textContent = "Copied"
-    setTimeout(() => { b.textContent = was }, 1400)
-  })
-})
-```
+- **Every step ends with `Pass:`** naming an observable outcome.
+- **Never fabricate a command.** Verify it exists this session.
 
 ## What goes inside `<details>`, and what never does
 
@@ -138,14 +92,7 @@ one replaced, long raw output, the remaining-checks list, an excluded artifact.
 
 **Never collapse the claim, the limits section, or a failure.** A reader who
 expands nothing must still come away with the correct impression, including the
-bad parts. Collapsing a caveat is how a report lies without containing a false
-sentence.
-
-Make the print stylesheet expand them, so a printed or PDF'd report is complete:
-
-```css
-@media print { details > div { display: block } }
-```
+bad parts.
 
 ## Self-contained, always
 
@@ -153,21 +100,6 @@ One file. Inline `<style>`, inline `<script>`, no CDN, no build step, no
 framework. It must render from `file://` years from now, on a machine with no
 network, after the toolchain that made it is gone.
 
-Also non-negotiable, because a report is a user-facing surface:
+Also non-negotiable: skip link, focus-visible outlines, responsive down to phone width, `prefers-reduced-motion` respected, `loading="lazy"` on images.
 
-- A skip link, focus-visible outlines, and `scroll-padding-top` if the nav is sticky.
-- Responsive down to phone width.
-- `prefers-reduced-motion` respected.
-- `loading="lazy"` on images.
-
-## The cost, 2026-09-21
-
-Across the last 20 PRs in one repo, five shipped HTML reports. All five used
-`<section>` + `<h2>` and an inline `<style>`; four had copy buttons. But
-**`<details>` appeared in only two, and screenshots in only two** — so the two
-things that most distinguish a report from a long comment were present in under
-half of them, and no two reports put their sections in the same order.
-
-The convention was real and working, living entirely in whichever file the
-author happened to copy. That is the failure this rule exists to stop: not
-absent practice, but practice that cannot be inherited.
+**Detail:** `~/.codex/rules-reference/pr-evidence-report-examples.md` — the 2026-09-21 convention regression that made this rule necessary.

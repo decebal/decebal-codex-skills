@@ -3,6 +3,9 @@
 //! ```text
 //! codex-guard infra-guard        # PreToolUse, Bash
 //! codex-guard bash-hygiene       # PreToolUse, Bash
+//! codex-guard pr-guard           # PreToolUse, Bash
+//! codex-guard prompt-number      # PreToolUse, apply_patch
+//! codex-guard rule-scope         # PreToolUse, apply_patch and Bash
 //! codex-guard comment-hygiene    # PostToolUse, apply_patch
 //! codex-guard trust '<command>'  # vet a wrapper chain, record the judgement
 //! ```
@@ -18,6 +21,10 @@ mod bash_hygiene;
 mod comment_hygiene;
 mod hook;
 mod infra;
+mod pr_guard;
+mod prompt_number;
+mod rule_scope;
+mod session_state;
 mod trust;
 
 #[cfg(test)]
@@ -34,9 +41,19 @@ fn main() -> ExitCode {
         return trust::run(args.get(1).map(String::as_str).unwrap_or(""));
     }
 
-    let hookish = matches!(sub, "infra-guard" | "bash-hygiene" | "comment-hygiene");
+    let hookish = matches!(
+        sub,
+        "infra-guard"
+            | "bash-hygiene"
+            | "pr-guard"
+            | "prompt-number"
+            | "rule-scope"
+            | "comment-hygiene"
+    );
     if !hookish {
-        eprintln!("usage: codex-guard <infra-guard|bash-hygiene|comment-hygiene|trust>");
+        eprintln!(
+            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|prompt-number|rule-scope|comment-hygiene|trust>"
+        );
         return ExitCode::from(2);
     }
 
@@ -47,6 +64,9 @@ fn main() -> ExitCode {
     match sub {
         "infra-guard" => infra::run(&payload),
         "bash-hygiene" => bash_hygiene::run(&payload),
+        "pr-guard" => pr_guard::run(&payload),
+        "prompt-number" => prompt_number::run(&payload),
+        "rule-scope" => rule_scope::run(&payload),
         "comment-hygiene" => comment_hygiene::run(&payload),
         _ => unreachable!("checked above"),
     }

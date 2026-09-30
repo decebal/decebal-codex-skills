@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.{svelte,ts,tsx,js,jsx}"
+---
+
 # Two event streams, strictly separated
 
 Most apps grow exactly two streams and then quietly merge them. Keep them apart.

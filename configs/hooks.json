@@ -16,6 +16,35 @@
             "command": "codex-guard bash-hygiene",
             "timeout": 5,
             "statusMessage": "Checking shell command"
+          },
+          {
+            "type": "command",
+            "command": "codex-guard pr-guard",
+            "timeout": 10,
+            "statusMessage": "Checking for an open PR from this session"
+          },
+          {
+            "type": "command",
+            "command": "codex-guard rule-scope",
+            "timeout": 5,
+            "statusMessage": "Loading path-scoped rules"
+          }
+        ]
+      },
+      {
+        "matcher": "^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard prompt-number",
+            "timeout": 5,
+            "statusMessage": "Checking prompt number claims"
+          },
+          {
+            "type": "command",
+            "command": "codex-guard rule-scope",
+            "timeout": 5,
+            "statusMessage": "Loading path-scoped rules"
           }
         ]
       }
@@ -29,6 +58,17 @@
             "command": "codex-guard comment-hygiene",
             "timeout": 5,
             "statusMessage": "Reviewing added comments"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard rule-scope",
+            "timeout": 5
           }
         ]
       }

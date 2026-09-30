@@ -26,19 +26,9 @@ is on predicting the future in time units, not on reporting the past.
 
 ### The incident
 
-On 2026-09-01 a workflow was authored to investigate three defects. Its output
-schema declared `effortHours` on every proposal and `correctedEffortHours` on
-every verdict, so eighteen agents were **required** to invent a number for work
-none of them had done. The verifier then "corrected" 6 to 14 and 1 to 2.5 — a
-fabrication refining a fabrication, in a currency that answers no question
-anybody had.
+**Detail:** `~/.codex/rules-reference/estimation-incident.md` — the 2026-09-01 effortHours/correctedEffortHours case (18 agents inventing numbers, 6→14, 1→2.5).
 
-The useful finding in that same output was never a duration. It was *"this
-proposal is UNSAFE because the dedup is keyed on the value and moves the
-denominator"* — a statement about **confidence in the shape**. That is what the
-scale below exists to carry, and the hours actively crowded it out.
-
-Design the schema so the fiction is unrepresentable.
+**Design the schema so the fiction is unrepresentable** — use a confidence enum, not a duration.
 
 ## Rock / sand / water — confidence, not size
 

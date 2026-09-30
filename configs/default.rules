@@ -10,6 +10,43 @@ prefix_rule(
     not_match = ["git status", "git log --oneline"],
 )
 
+# The strictest matching rule wins, so these hold even beside an "always allow"
+# for `git push` that the TUI appends to this file. Prefix rules match tokens in
+# order: a flag placed between the remote and the branch, or `git -C <dir>`,
+# escapes them. The repository's pre-push hook is the backstop for those.
+prefix_rule(
+    pattern = ["git", "push", ["origin", "upstream"], ["main", "master", "+main", "+master", "HEAD:main", "HEAD:master", "HEAD:refs/heads/main", "HEAD:refs/heads/master"]],
+    decision = "forbidden",
+    justification = "Never push to the trunk. Push a feature branch with `git push -u origin HEAD:<type>/<name>` and open a PR.",
+    match = ["git push origin main", "git push origin HEAD:main --force", "git push upstream master"],
+    not_match = ["git push origin feat/x", "git push origin HEAD:feat/main-menu", "git push origin maintenance"],
+)
+
+prefix_rule(
+    pattern = ["git", "push", ["-u", "--set-upstream", "-f", "--force", "--force-with-lease"], ["origin", "upstream"], ["main", "master", "+main", "+master", "HEAD:main", "HEAD:master", "HEAD:refs/heads/main", "HEAD:refs/heads/master"]],
+    decision = "forbidden",
+    justification = "Never push to the trunk. Push a feature branch with `git push -u origin HEAD:<type>/<name>` and open a PR.",
+    match = ["git push -u origin main", "git push --force origin master", "git push --force-with-lease origin HEAD:main"],
+    not_match = ["git push -u origin HEAD:feat/x", "git push --force-with-lease origin feat/x"],
+)
+
+prefix_rule(
+    pattern = ["git", "commit", ["--no-verify", "-n"]],
+    decision = "forbidden",
+    justification = "Never bypass the hooks. Fix what the hook reports and commit again.",
+    match = ["git commit --no-verify -m wip", "git commit -n -m wip"],
+    not_match = ["git commit -m wip", "git commit --amend --no-edit"],
+)
+
+# For push, -n is --dry-run, so only the long flag is forbidden.
+prefix_rule(
+    pattern = ["git", "push", "--no-verify"],
+    decision = "forbidden",
+    justification = "Never bypass the hooks. Fix what the pre-push hook reports and push again.",
+    match = ["git push --no-verify", "git push --no-verify origin feat/x"],
+    not_match = ["git push -n origin feat/x", "git push origin feat/x"],
+)
+
 prefix_rule(
     pattern = ["cargo", "publish"],
     decision = "prompt",
