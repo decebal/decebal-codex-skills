@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semantic ISA"
+  short_description: "Design typed, verifiable agent execution contracts"
+  default_prompt: "Use $semantic-isa to design a typed execution contract for this agent, grounded in its actual tools, permissions and evidence."

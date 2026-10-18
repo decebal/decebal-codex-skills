@@ -48,6 +48,11 @@ This helps explicit invocation; it is not a dependency engine.
 
 ## Rules
 
+`semantic-isa` composes installed `brainstorming`, `arch`,
+`rust-clean-architecture`, `security-review` and `integration-test` when their
+guidance is needed. Implementation planning can continue through `codex-prd`
+and `codex-beads`; composition grants no execution authority.
+
 - Link only real relationships.
 - Do not duplicate another skill's full instructions.
 - Load only references needed for current request.

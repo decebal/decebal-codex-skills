@@ -5,6 +5,10 @@ project-wide under `.agents/skills/` or user-wide under `~/.codex/skills/`.
 
 ## Installed Skills
 
+[`semantic-isa`](../skills/semantic-isa/SKILL.md) designs typed agent execution
+contracts and accurate research explainers. Install the whole package for its
+specification template and optional Codex tool-routing reference.
+
 ### Development & Automation
 
 | Skill | Purpose | Trigger Phrases |
