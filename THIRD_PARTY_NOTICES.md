@@ -1,5 +1,9 @@
 # Third-party notices
 
+The owner-authorised Codex port in `skills/semantic-isa/` derives from
+[`decebal/decebal-claude-skills` commit ef8779a](https://github.com/decebal/decebal-claude-skills/commit/ef8779a43d476e8df0a3f0e7a3eb903fc9669638).
+Its [origin notice](skills/semantic-isa/NOTICE.md) records attribution and changes.
+
 Repository includes modified material derived from
 [`anthropics/skills`](https://github.com/anthropics/skills):
 

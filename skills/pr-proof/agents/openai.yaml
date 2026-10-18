@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR Proof"
+  short_description: "Build commit-bound pull request evidence reports"
+  default_prompt: "Use $pr-proof to prepare an honest evidence report for this pull request, with reproducible steps and explicit verification limits."
