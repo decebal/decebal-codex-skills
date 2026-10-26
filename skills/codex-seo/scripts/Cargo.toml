@@ -31,7 +31,7 @@ description = "Safe static SEO evidence collector for the codex-seo skill"
 [dependencies]
 reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls"] }
 roxmltree = "0.21"
-scraper = "0.27"
+scraper = "0.29"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 url = "2"
