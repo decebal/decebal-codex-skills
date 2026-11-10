@@ -424,12 +424,10 @@ fn read_input(path: &str) -> Result<String, String> {
 }
 
 fn parse_options(args: &[String]) -> Result<BTreeMap<String, String>, String> {
-    if !args.len().is_multiple_of(2) {
+    let (pairs, []) = args.as_chunks::<2>() else {
         return Err("every option requires one value".to_owned());
-    }
+    };
     let mut values = BTreeMap::new();
-    let (pairs, remainder) = args.as_chunks::<2>();
-    debug_assert!(remainder.is_empty());
     for pair in pairs {
         if !pair[0].starts_with("--") {
             return Err(format!("unexpected positional argument {:?}", pair[0]));
