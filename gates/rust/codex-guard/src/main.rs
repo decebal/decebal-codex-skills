@@ -4,6 +4,7 @@
 //! codex-guard infra-guard        # PreToolUse, Bash
 //! codex-guard bash-hygiene       # PreToolUse, Bash
 //! codex-guard pr-guard           # PreToolUse, Bash
+//! codex-guard stack-guard        # PreToolUse, Bash
 //! codex-guard prompt-number      # PreToolUse, apply_patch
 //! codex-guard rule-scope         # PreToolUse, apply_patch and Bash
 //! codex-guard comment-hygiene    # PostToolUse, apply_patch
@@ -25,6 +26,7 @@ mod pr_guard;
 mod prompt_number;
 mod rule_scope;
 mod session_state;
+mod stack_guard;
 mod trust;
 
 #[cfg(test)]
@@ -46,13 +48,14 @@ fn main() -> ExitCode {
         "infra-guard"
             | "bash-hygiene"
             | "pr-guard"
+            | "stack-guard"
             | "prompt-number"
             | "rule-scope"
             | "comment-hygiene"
     );
     if !hookish {
         eprintln!(
-            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|prompt-number|rule-scope|comment-hygiene|trust>"
+            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|stack-guard|prompt-number|rule-scope|comment-hygiene|trust>"
         );
         return ExitCode::from(2);
     }
@@ -65,6 +68,7 @@ fn main() -> ExitCode {
         "infra-guard" => infra::run(&payload),
         "bash-hygiene" => bash_hygiene::run(&payload),
         "pr-guard" => pr_guard::run(&payload),
+        "stack-guard" => stack_guard::run(&payload),
         "prompt-number" => prompt_number::run(&payload),
         "rule-scope" => rule_scope::run(&payload),
         "comment-hygiene" => comment_hygiene::run(&payload),

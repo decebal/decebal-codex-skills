@@ -152,6 +152,31 @@ Both land the work under a new SHA, so anything that reasons about ancestry lies
   is invisible; at ~5 commits with no PR, stop and open one.
 - **Not ready while the branch has more than one commit.** Collapse, re-run the
   gates on the new SHA, then mark it ready.
-- **One feature = one PR.** Never stack a PR on an open PR's branch.
+- **One feature = one PR**, unless it depends on another open PR's code; then it
+  is a stack layer (below). Branching from a convenient local branch is not a
+  dependency: that PR targets the trunk.
 - **Size is never a reason to split or pause** ([definition-of-done.md](definition-of-done.md)).
 - **A branch reused after its PR merged needs a NEW branch**, not a new PR on it.
+
+## Stacked PRs
+
+A PR may be based on another open PR's branch when it needs that PR's code.
+
+- **Open a layer as a draft** with `--base <parent branch>`. It is marked ready
+  only once its base is the trunk.
+- **One commit per author per layer.** A second author's work is its own layer
+  on top, not a commit on the first author's branch.
+- **Land bottom-up.** Merge the bottom layer, restack the next onto the trunk
+  (`git rebase --onto origin/<trunk> <old-parent-head> <branch>`), gate it, then
+  merge it. Rebase and squash merges put the parent on the trunk under new SHAs,
+  so an unrestacked layer replays the parent's commits.
+- **Review each layer's own diff**, against its parent, and gate each layer's
+  head. A gate verdict on an upper layer goes stale whenever the parent moves.
+- **Enforced by `stack-guard`** in `codex-guard` and `claude-guard` (PreToolUse,
+  Bash). With `git config stack-guard.gate-context <status>` set, a merge also
+  needs that status at `success` on the exact head, merged with
+  `--match-head-commit`.
+
+The cost behind it, 2026-11-10: with stacking banned, one contributor had five
+hand-built chains open in one repo, none gated, several layers carrying more than
+one commit by one author, and one carrying a stale copy of its parent's commit.

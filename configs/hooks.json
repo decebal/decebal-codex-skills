@@ -25,6 +25,12 @@
           },
           {
             "type": "command",
+            "command": "codex-guard stack-guard",
+            "timeout": 10,
+            "statusMessage": "Checking stacked PR rules"
+          },
+          {
+            "type": "command",
             "command": "codex-guard rule-scope",
             "timeout": 5,
             "statusMessage": "Loading path-scoped rules"
