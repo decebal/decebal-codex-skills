@@ -26,6 +26,8 @@ struct Fake {
     missing: Option<&'static str>,
     upstream_dupes: usize,
     own: HashMap<&'static str, u64>,
+    /// Commits per author on any `since..tip` range.
+    authors: Vec<(&'static str, usize)>,
     gate: Option<&'static str>,
     status: Option<&'static str>,
 }
@@ -62,6 +64,23 @@ impl Lookup for Fake {
     }
     fn own_commits_since(&self, _dir: &str, since: &str, _deadline: Instant) -> Option<u64> {
         Some(self.own.get(since).copied().unwrap_or(0))
+    }
+    fn author_counts(
+        &self,
+        _dir: &str,
+        _since: &str,
+        _tip: &str,
+        _d: Instant,
+    ) -> Option<Vec<(String, usize)>> {
+        Some(
+            self.authors
+                .iter()
+                .map(|(a, n)| ((*a).into(), *n))
+                .collect(),
+        )
+    }
+    fn has_open_child(&self, _repo: &str, head: &str, _d: Instant) -> Option<bool> {
+        Some(self.prs.iter().any(|p| p.base == head && p.state == "OPEN"))
     }
     fn gate_context(&self, _dir: &str, _deadline: Instant) -> Option<String> {
         self.gate.map(str::to_string)
@@ -181,6 +200,35 @@ fn merge_lands_bottom_up() {
     let reason = run("gh pr merge 11 --rebase", &fake).unwrap();
     assert!(reason.contains("stacked on feat/a (#10)"), "{reason}");
     assert_eq!(run("gh pr merge 10 --rebase", &fake), None);
+}
+
+#[test]
+fn a_stack_root_with_two_commits_by_one_author_is_not_ready_or_mergeable() {
+    let mut fake = Fake {
+        prs: two_layer_stack(),
+        authors: vec![("amelian", 3), ("decebal", 1)],
+        ..Fake::default()
+    };
+    let reason = run("gh pr ready 10", &fake).unwrap();
+    assert!(reason.contains("has 3 commits by amelian;"), "{reason}");
+    assert!(!reason.contains("decebal"), "{reason}");
+    assert!(run("gh pr merge 10 --rebase", &fake)
+        .unwrap()
+        .contains("before it is merged"));
+
+    fake.authors = vec![("amelian", 1), ("decebal", 1)];
+    assert_eq!(run("gh pr ready 10", &fake), None);
+}
+
+#[test]
+fn a_crowded_pr_outside_any_stack_is_left_to_other_checks() {
+    let fake = Fake {
+        prs: vec![pr(12, "main", "fix/solo", "OPEN", "cccccccccc")],
+        authors: vec![("amelian", 5)],
+        ..Fake::default()
+    };
+    assert_eq!(run("gh pr ready 12", &fake), None);
+    assert_eq!(run("gh pr merge 12 --rebase", &fake), None);
 }
 
 #[test]

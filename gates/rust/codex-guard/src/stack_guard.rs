@@ -8,6 +8,8 @@
 //! - `gh pr create --base <non-default>` unless it is `--draft`, the base has an
 //!   open PR, and the new head contains that PR's head commit;
 //! - `gh pr ready` on a PR whose base is not the default branch;
+//! - `gh pr ready` / `gh pr merge` on a PR that roots a stack while an author
+//!   has more than one commit on it;
 //! - `gh pr merge` on a PR whose base is not the default branch, and, when
 //!   `git config stack-guard.gate-context` names a commit status, on a head
 //!   without that status at `success` or without `--match-head-commit <sha>`;
@@ -149,6 +151,16 @@ pub(crate) trait Lookup {
     ) -> Option<usize>;
     /// Commits in `since..HEAD` by the configured `user.email`.
     fn own_commits_since(&self, dir: &str, since: &str, deadline: Instant) -> Option<u64>;
+    /// Commits in `since..tip` per author name.
+    fn author_counts(
+        &self,
+        dir: &str,
+        since: &str,
+        tip: &str,
+        deadline: Instant,
+    ) -> Option<Vec<(String, usize)>>;
+    /// Whether an open PR in `repo` is based on `head`.
+    fn has_open_child(&self, repo: &str, head: &str, deadline: Instant) -> Option<bool>;
     /// `git config stack-guard.gate-context` in the repo at `dir`.
     fn gate_context(&self, dir: &str, deadline: Instant) -> Option<String>;
     /// The newest state of `context` on `sha`: `Some(None)` when the commit has
@@ -220,15 +232,19 @@ fn check(trigger: &Trigger, cwd: &str, lookup: &dyn Lookup, deadline: Instant) -
             None
         }
         Trigger::Ready { repo, pr } => {
-            let (repo, _) = resolve_repo(repo.as_deref(), cwd, lookup, deadline)?;
+            let (repo, local) = resolve_repo(repo.as_deref(), cwd, lookup, deadline)?;
             let pr = resolve_pr(pr, &repo, cwd, lookup, deadline)?;
             let default = lookup.default_branch(cwd, &repo, deadline)?;
-            (pr.base != default).then(|| {
-                format!(
+            if pr.base != default {
+                return Some(format!(
                     "#{} is based on {}, not {default}. A stacked PR stays draft until its parent lands and it is restacked onto {default} (`gh pr edit {} --base {default}`).",
                     pr.number, pr.base, pr.number
-                )
-            })
+                ));
+            }
+            if !local {
+                return None;
+            }
+            crowded_root(&pr, &repo, &default, "ready", cwd, lookup, deadline)
         }
         Trigger::Merge {
             repo,
@@ -250,6 +266,11 @@ fn check(trigger: &Trigger, cwd: &str, lookup: &dyn Lookup, deadline: Instant) -
             }
             if !local {
                 return None;
+            }
+            if let Some(reason) =
+                crowded_root(&pr, &repo, &default, "merged", cwd, lookup, deadline)
+            {
+                return Some(reason);
             }
             let context = lookup.gate_context(cwd, deadline)?;
             if match_head.as_deref() != Some(pr.head_oid.as_str()) {
@@ -341,6 +362,36 @@ fn check(trigger: &Trigger, cwd: &str, lookup: &dyn Lookup, deadline: Instant) -
             })
         }
     }
+}
+
+/// The deny reason when `pr` roots a stack and an author has more than one
+/// commit on it. A root lands first, so its layer is the one the next restack
+/// is cut against.
+fn crowded_root(
+    pr: &Pr,
+    repo: &str,
+    default: &str,
+    action: &str,
+    cwd: &str,
+    lookup: &dyn Lookup,
+    deadline: Instant,
+) -> Option<String> {
+    if !lookup.has_open_child(repo, &pr.head, deadline)? {
+        return None;
+    }
+    let counts = lookup.author_counts(cwd, &format!("origin/{default}"), &pr.head_oid, deadline)?;
+    let crowded: Vec<String> = counts
+        .iter()
+        .filter(|(_, n)| *n > 1)
+        .map(|(author, n)| format!("{n} commits by {author}"))
+        .collect();
+    (!crowded.is_empty()).then(|| {
+        format!(
+            "#{} roots a stack and has {}; a layer holds one commit per author. Each author collapses their own (`git reset --soft <base>` then one commit) before it is {action}.",
+            pr.number,
+            crowded.join(", ")
+        )
+    })
 }
 
 /// The repo a command acts on, and whether it is the repo checked out at `cwd`
@@ -711,6 +762,37 @@ impl Lookup for Live {
         git(dir, &["rev-list", "--count", &author, &range], deadline)?
             .parse()
             .ok()
+    }
+
+    fn author_counts(
+        &self,
+        dir: &str,
+        since: &str,
+        tip: &str,
+        deadline: Instant,
+    ) -> Option<Vec<(String, usize)>> {
+        let range = format!("{since}..{tip}");
+        let out = git(dir, &["log", "--format=%an", &range], deadline)?;
+        let mut counts: Vec<(String, usize)> = Vec::new();
+        for author in out.lines().filter(|l| !l.is_empty()) {
+            match counts.iter_mut().find(|(a, _)| a == author) {
+                Some((_, n)) => *n += 1,
+                None => counts.push((author.to_string(), 1)),
+            }
+        }
+        Some(counts)
+    }
+
+    fn has_open_child(&self, repo: &str, head: &str, deadline: Instant) -> Option<bool> {
+        let out = run_bounded(
+            Command::new("gh").args([
+                "pr", "list", "--repo", repo, "--base", head, "--state", "open", "--limit", "1",
+                "--json", "number",
+            ]),
+            deadline,
+        )?;
+        let listed: Vec<Value> = serde_json::from_str(&out).ok()?;
+        Some(!listed.is_empty())
     }
 
     fn gate_context(&self, dir: &str, deadline: Instant) -> Option<String> {
