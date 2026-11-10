@@ -1,12 +1,13 @@
 # codex-guard lifecycle hooks
 
-Six optional guardrails ship as one Rust binary: [`gates/rust/codex-guard`](../gates/rust/codex-guard).
+Seven optional guardrails ship as one Rust binary: [`gates/rust/codex-guard`](../gates/rust/codex-guard).
 
 | Subcommand | Event | Effect |
 |---|---|---|
 | `codex-guard infra-guard` | `PreToolUse`, `Bash` | Denies high-blast-radius infrastructure and destructive commands |
 | `codex-guard bash-hygiene` | `PreToolUse`, `Bash` | Blocks compound shell commands/substitution; safely rewrites a redundant trailing `2>&1` |
 | `codex-guard pr-guard` | `PreToolUse`, `Bash` | Denies a second PR, or a new branch, while a PR this session created is still open in that repo |
+| `codex-guard stack-guard` | `PreToolUse`, `Bash` | Stacked PRs open as drafts, land bottom-up, keep one commit per author per layer, and are never pushed carrying a parent's stale commits |
 | `codex-guard prompt-number` | `PreToolUse`, `apply_patch` | Denies creating `.prompts/NNN-*.md` when `.prompts/.numbers/NNN` does not exist |
 | `codex-guard rule-scope` | `PreToolUse`, `apply_patch` and `Bash`; `PostCompact` | Adds a path-scoped rule to model context the first time a session touches a file it covers; forgets what it sent when the history is compacted |
 | `codex-guard comment-hygiene` | `PostToolUse`, `apply_patch` | Returns added comment lines for immediate review |
@@ -98,6 +99,25 @@ Limits:
 - A PR created outside this hook's view (the web UI, another tool, a denied-then-hand-run command) is not in the ledger.
 - A PR someone else opens later on a head branch this session recorded counts as the session's.
 - The head is read from `cwd` when `--head` is absent, which is also what `gh` does.
+
+## stack-guard
+
+The same module as `claude-guard stack-guard`, byte for byte, so Codex and Claude
+Code users get one set of stack rules. A PR is **stacked** when its base is
+another PR's head branch. The guard reads the PR graph with `gh` and the local
+branch with `git`, and denies:
+
+| Command | Denied when |
+|---|---|
+| `gh pr create --base <b>` | `b` is not the default branch and: it has no open PR; `--draft` is missing; or the head does not contain that PR's head commit |
+| `gh pr ready [<pr>]` | the PR's base is not the default branch |
+| `gh pr merge [<pr>]` | the PR's base is not the default branch. With `git config stack-guard.gate-context <status>` set: `--match-head-commit <head>` is missing, or `<status>` on that head is not `success` |
+| `git push` | the pushed commits include patches already on `origin/<default>` under other SHAs; or the branch's open stacked PR still contains its merged parent's old head, or no longer contains its open parent's head |
+| `git commit` (not `--amend`/`--fixup`) | the branch's open PR is stacked and you already have a commit on it since the parent's head |
+
+Each deny names the restack command. It fails open with no GitHub remote, `gh`
+failing, an object missing from the local store, or past its 8 s deadline. A
+merge from the GitHub UI or a plain terminal is not checked.
 
 ## prompt-number
 
