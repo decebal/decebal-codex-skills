@@ -110,8 +110,8 @@ branch with `git`, and denies:
 | Command | Denied when |
 |---|---|
 | `gh pr create --base <b>` | `b` is not the default branch and: it has no open PR; `--draft` is missing; or the head does not contain that PR's head commit |
-| `gh pr ready [<pr>]` | the PR's base is not the default branch |
-| `gh pr merge [<pr>]` | the PR's base is not the default branch. With `git config stack-guard.gate-context <status>` set: `--match-head-commit <head>` is missing, or `<status>` on that head is not `success` |
+| `gh pr ready [<pr>]` | the PR's base is not the default branch; or it roots a stack and an author has more than one commit on it |
+| `gh pr merge [<pr>]` | the PR's base is not the default branch; or it roots a stack and an author has more than one commit on it. With `git config stack-guard.gate-context <status>` set: `--match-head-commit <head>` is missing, or `<status>` on that head is not `success` |
 | `git push` | the pushed commits include patches already on `origin/<default>` under other SHAs; or the branch's open stacked PR still contains its merged parent's old head, or no longer contains its open parent's head |
 | `git commit` (not `--amend`/`--fixup`) | the branch's open PR is stacked and you already have a commit on it since the parent's head |
 
