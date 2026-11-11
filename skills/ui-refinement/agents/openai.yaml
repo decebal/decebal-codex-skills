@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI Refinement"
+  short_description: "Review and refine interfaces page by page"
+  default_prompt: "Use $ui-refinement to review this interface and document its decisions and evidence."
