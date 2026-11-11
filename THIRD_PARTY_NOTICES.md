@@ -1,5 +1,7 @@
 # Third-party notices
 
+`skills/ui-refinement/` adapts the Allstack UI review methods under Apache License 2.0. See its [origin notice](skills/ui-refinement/NOTICE.md) and [license](skills/ui-refinement/LICENSE.txt).
+
 The owner-authorised Codex port in `skills/semantic-isa/` derives from
 [`decebal/decebal-claude-skills` commit ef8779a](https://github.com/decebal/decebal-claude-skills/commit/ef8779a43d476e8df0a3f0e7a3eb903fc9669638).
 Its [origin notice](skills/semantic-isa/NOTICE.md) records attribution and changes.

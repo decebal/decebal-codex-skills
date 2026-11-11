@@ -4,7 +4,7 @@
 [![skill tests](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml/badge.svg)](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**58 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
+**59 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
 making agent work repeatable, reviewable, and harder to fake.**
 
 Prompts guide behavior. Compiled checks cover failures prose does not prevent:
@@ -34,7 +34,7 @@ demonstrate.
 
 | Layer | Contents | Use it for |
 |---|---|---|
-| Skills | 58 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
+| Skills | 59 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
 | Portable rules | 21 focused [`rules/`](rules/) with incidents and exceptions; file-type rules carry `paths:` and reach a session through `codex-guard rule-scope` | Selecting instruction fragments worth carrying into another codebase |
@@ -88,6 +88,8 @@ Want the whole collection? Clone it, review
 sharing.
 
 ## Choose your layer
+
+Use [`ui-refinement`](skills/ui-refinement/SKILL.md) for page-by-page interface review, decisions, screenshots and contribution gates. For planned delivery, invoke it alongside `ritual` or `ritual-full` when that separate workflow is installed.
 
 For governed agent/MCP execution, use [`semantic-isa`](skills/semantic-isa/SKILL.md)
 to design typed instructions, scoped verification, provenance and refusal tests.
@@ -172,7 +174,7 @@ See [`skills-guide/codex-workflow.md`](skills-guide/codex-workflow.md) and
 
 ```text
 .
-├── skills/          57 reusable Codex skills
+├── skills/          59 reusable Codex skills
 ├── gates/           Rust gates, hook glue, fixtures, and adoption guide
 ├── rules/           portable instruction fragments
 ├── templates/       AGENTS.md starters by project shape
