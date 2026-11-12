@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ritual"
+  short_description: "Route planned work from idea to shipped change"
+  default_prompt: "Use $ritual to find which step this feature's flow is at and do that step, with its Chronis epic and gates."

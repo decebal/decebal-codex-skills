@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ritual Full"
+  short_description: "Run the ritual flow with every tool turned on"
+  default_prompt: "Use $ritual-full to run the preflight, then plan and ship this feature with a Semantic ISA design and two fresh reviewers."

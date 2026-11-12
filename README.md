@@ -4,7 +4,7 @@
 [![skill tests](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml/badge.svg)](https://github.com/decebal/decebal-codex-skills/actions/workflows/test-skills.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**59 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
+**61 Codex skills. 21 Rust gate crates. 15 incident-backed rules. One kit for
 making agent work repeatable, reviewable, and harder to fake.**
 
 Prompts guide behavior. Compiled checks cover failures prose does not prevent:
@@ -34,8 +34,9 @@ demonstrate.
 
 | Layer | Contents | Use it for |
 |---|---|---|
-| Skills | 59 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
+| Skills | 61 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
+| Ritual flow | [`$ritual`](skills/ritual/SKILL.md) and [`$ritual-full`](skills/ritual-full/SKILL.md): Think, Spec, Plan, Build, Review, Ship, Reflect on one Chronis epic | Planned work with a file per step, gates between steps, and one human approval of the design |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
 | Portable rules | 21 focused [`rules/`](rules/) with incidents and exceptions; file-type rules carry `paths:` and reach a session through `codex-guard rule-scope` | Selecting instruction fragments worth carrying into another codebase |
 | Quality gates | 21-crate Rust workspace under [`gates/rust/`](gates/rust/) | Turning selected rules into fast, testable failures |
@@ -120,7 +121,7 @@ mean “configured for your codebase.”
 | Skill and plugin metadata | Enforced in the same workflow | Every skill frontmatter file, `agents/openai.yaml`, and plugin manifest passes repository validation |
 | `codex-guard` | Real binary smoke-tested | Argument parsing and representative allow, rewrite, and deny outcomes work outside unit tests |
 | Five config-driven gates | Run against a hostile fixture | Layer, forbidden-pattern, authority, attribution, and test-script gates catch known violations |
-| Skill behavior | Five installable runtimes tested in CI | `blog-image`, `web-video`, `skill-autoresearch`, `codex-seo`, and `app-store-optimization` pass executable tests; this is not a claim that all 58 skills have behavioral tests |
+| Skill behavior | Five installable runtimes tested in CI | `blog-image`, `web-video`, `skill-autoresearch`, `codex-seo`, and `app-store-optimization` pass executable tests; this is not a claim that all 61 skills have behavioral tests |
 | Remaining gates | Reusable, opt-in | Binaries and tests ship here; adopters must configure paths and invoke them from CI or hooks |
 
 [`gates/gates.toml`](gates/gates.toml) is a worked example for a Rust and
@@ -174,7 +175,7 @@ See [`skills-guide/codex-workflow.md`](skills-guide/codex-workflow.md) and
 
 ```text
 .
-├── skills/          59 reusable Codex skills
+├── skills/          61 reusable Codex skills
 ├── gates/           Rust gates, hook glue, fixtures, and adoption guide
 ├── rules/           portable instruction fragments
 ├── templates/       AGENTS.md starters by project shape
