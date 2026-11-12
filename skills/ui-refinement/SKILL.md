@@ -1,6 +1,6 @@
 ---
 name: ui-refinement
-description: Review and refine a website or desktop app page by page, recording design decisions and enforcing contribution gates with visual and runtime evidence.
+description: Review and refine website or desktop UI, and carry established design decisions and contribution gates into new features.
 ---
 
 # Review the interface
@@ -24,6 +24,16 @@ Add UI evidence to the ritual's existing artifacts instead of creating a competi
 | Reflect | Record UI drift, gate failures and uncovered states in the ritual report. |
 
 The ritual's approval, review and drift rules remain authoritative. Do not change an approved design to append implementation results; put those in the plan, review or linked decision record according to the ritual.
+
+## Apply decisions to new features
+
+Before designing or building a new UI feature, find the product's current indexed design decisions, component inventory, page and state reviews, open owner feedback, and actual contribution gates. Trace the new journey and affected shared components to applicable rules and approved examples; record the source of each requirement in the existing ritual design or plan. Use the project's established controls and patterns, including documented exceptions. A missing decision, conflicting instruction, absent component or unenforced gate is an open finding: resolve it with the owner where needed, or explicitly mark the affected work unverified. Do not invent a product-wide rule from one example.
+
+When a live product and repository both exist, compare the affected rendered behavior and shared components before choosing a baseline. Record deployment identity when known, and reconcile differences before replacing either version. Capture the owner's explicit design approval and its scope in the decision record; a screenshot or passing automated gate is not approval.
+
+Map each applicable decision to a concrete check at the real boundary: an automated rejection where practical, or a named human review with reproducible evidence where judgment is required. Include affected pages, responsive states, keyboard and accessibility behavior; preserve existing security, indexing and validation checks. Prove both acceptance and rejection for new automated gates, and report whether each gate blocks locally, runs in CI or is required for merge. Do not claim universal enforcement from instructions or an optional hook.
+
+Break owner feedback into tracker tasks within the current ritual, grouped by a complete user journey and clear ownership. Each builder handoff includes the exact reproduction, expected result, source and shared consumers, applicable decisions and checks, dependencies, evidence required and unverified states. Preserve explicit owner preferences; distinguish observed defects from hypotheses and link screenshots when supplied. Do not dispatch a builder or send context externally without the applicable authorization.
 
 For an authorized fix handoff, include the tested build and environment, route and viewport, starting state, exact actions and test data, observed and expected behavior, impact and evidence. Name affected sources, shared consumers, existing gates, worktree ownership, uncommitted work and permitted actions. State what remains unverified; require the recipient to reproduce the journey and retain source-bound screenshots. Do not send secrets or private customer data.
 
