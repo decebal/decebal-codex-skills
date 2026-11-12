@@ -6,8 +6,8 @@ Chronis epic that names it.
 ## Two paths
 
 - **Here, in conversation:** follow the process below.
-- **EGM:** ask the user to run `/egm:egm-brainstorm` in a Claude Code session on the same
-  checkout (EGM is a Claude Code plugin; Codex cannot start it). When it finishes, move
+- **EGM:** run EGM's `egm-brainstorm` skill (as in the ritual skill's EGM section), asking the
+  user its questions. When it finishes, move
   `concepts_brief.md` to the dated brief path and index it.
 
 ## Process

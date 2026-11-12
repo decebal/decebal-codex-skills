@@ -1,6 +1,6 @@
 ---
 name: ritual-full
-description: "The ritual flow (Think, Spec, Plan, Build, Review, Ship, Reflect on a Chronis epic) with every tool on by default: EGM for brainstorm, draft, review and drift (run by the user in Claude Code); a Semantic ISA section in every design; two independent fresh-context reviewers; cos hires per step; graphify context; codex-guard hooks. Runs a tool preflight first and stops on anything missing. Triggers on: ritual full, full ritual, full flow, plan this feature with every tool, ritual with egm, ritual with semantic isa."
+description: "The ritual flow (Think, Spec, Plan, Build, Review, Ship, Reflect on a Chronis epic) with every tool on by default: EGM for brainstorm, draft, review and drift, run by the agent; a Semantic ISA section in every design; two independent fresh-context reviewers; cos hires per step; graphify context; codex-guard hooks. Runs a tool preflight first and stops on anything missing. Triggers on: ritual full, full ritual, full flow, plan this feature with every tool, ritual with egm, ritual with semantic isa."
 ---
 
 # ritual-full
@@ -19,28 +19,27 @@ Run each check, print one table, then stop if any row is `missing`:
 | Tool | Check | Install when missing |
 |---|---|---|
 | Chronis `cn` | `cn --help` exits 0; `.chronis/` in the main checkout | `cargo install chronis`, then `cn init` in the repo |
-| EGM | `claude plugin list` shows `egm@egm` enabled (it runs in Claude Code, started by the user) | `claude plugin marketplace add google/elephant-goldfish-model` then `claude plugin install egm@egm`, new Claude Code session |
+| EGM | `~/.codex/config.toml` has `[plugins."egm@egm"] enabled = true` | add the marketplace `https://github.com/google/elephant-goldfish-model` and enable `egm@egm` as EGM's `docs/codex.md` describes, new session |
 | skills | `ritual`, `semantic-isa`, `pr-proof`, `systematic-debugging` under `~/.agents/skills/` or the repo's `.agents/skills/` | `cp -R skills/<name> ~/.agents/skills/<name>` from this repo |
 | cos | `cos ritual check --help` exits 0 | clone `decebal/chief-of-staff-v2`, run `task setup` in it |
 | graphify | `graphify --help` exits 0; `graphify-out/` in the repo, else build it | `uv tool install graphifyy` then `graphify codex install`; the same reinstall fixes `graphify --help` exiting 126 with `bad interpreter` |
 | codex-guard | `command -v codex-guard` finds it (it has no `--help`; with no subcommand it prints usage and exits 2); the trusted Codex hooks config registers `codex-guard infra-guard`, `bash-hygiene` and `pr-guard` | `cargo install --path gates/rust/codex-guard` from this repo, then register the hooks as `configs/hooks.json` shows and trust them |
 
 Report: `preflight: cn ok · egm ok · skills ok · cos ok · graphify ok · codex-guard ok`, with
-`missing (<install command>)` in place of `ok` where it applies. Codex cannot start an `/egm:`
-command: for every EGM step below, give the user the exact command to run in Claude Code on the
-same checkout and wait for its output file.
+`missing (<install command>)` in place of `ok` where it applies. You run every EGM step below
+yourself, spawning its reviewers with `spawn_agent` ([ritual's EGM section](../ritual/SKILL.md#egm)).
 
 ## What is on, per step
 
 | Step | On by default | Hands over (in addition to ritual's) |
 |---|---|---|
-| Think | user runs `/egm:egm-brainstorm`; `graphify query` on the modules the idea touches | `concepts_brief.md` moved to the dated brief path; graph nodes cited |
-| Spec | user runs `/egm:egm-draft`; a **Semantic ISA** section; review by `/egm:egm-review` **and** a hired `ritual-goldfish`; resolve with `/egm:egm-resolve` or `/egm:egm-review-loop`; `cos ritual check` | design with ISA section; two review files |
+| Think | EGM `egm-brainstorm`; `graphify query` on the modules the idea touches | `concepts_brief.md` moved to the dated brief path; graph nodes cited |
+| Spec | EGM `egm-draft`; a **Semantic ISA** section; review by EGM `egm-review` **and** a hired `ritual-goldfish`; resolve with EGM `egm-resolve` or `egm-review-loop`; `cos ritual check` | design with ISA section; two review files |
 | Plan | one bead per ISA sink whose done-when is its VERIFY test; graph read back ([graph.md](../ritual/references/graph.md)) | plan with the ISA test matrix as trophy rows |
 | Build | `cos agents spawn --role builder` per ready bead, own worktree; codex-guard hooks on | ISA matrix rows as real tests |
 | Review | `cos agents spawn --role reviewer`; sink-to-VERIFY check | code review naming each sink's VERIFY at file:line |
 | Ship | `$pr-proof` evidence; one PR, one commit ([ship.md](../ritual/references/ship.md)) | the evidence report |
-| Reflect | user runs `/egm:egm-drift-report` on the design; new-sink check | report under `docs/reports/` |
+| Reflect | EGM `egm-drift-report` on the design; new-sink check | report under `docs/reports/` |
 
 ## Spec: the Semantic ISA section
 

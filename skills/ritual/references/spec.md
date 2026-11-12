@@ -21,9 +21,9 @@ copy while the branch exists, and a hired reviewer's worktree is cut from it.
 
 ## Draft (the Elephant)
 
-The author has the full context. Either draft here or ask the user to run `/egm:egm-draft` with
-the brief in a Claude Code session on the same checkout (EGM is a Claude Code plugin; Codex cannot
-start it). EGM writes `design_draft.md`, which you move to the dated path.
+The author has the full context. Either draft here or run EGM's `egm-draft` skill on the brief
+(as in the ritual skill's EGM section); EGM writes `design_draft.md`, which you move to the dated
+path.
 
 A design covers:
 
@@ -47,7 +47,8 @@ Name the design on the epic:
 The reviewer reads only the draft and the live code, never the author's conversation. A reviewer
 that read the chat inherits its blind spots. Pick one:
 
-- the user runs `/egm:egm-review <path>` in Claude Code (EGM starts its own isolated reviewers);
+- you run EGM's `egm-review` on the design: follow its `SKILL.md` and spawn its persona reviewers
+  with `spawn_agent` in fresh contexts; its consolidated report becomes this review;
 - `cos` hires `ritual-goldfish` on the design;
 - a fresh Codex session (`codex exec`) given only the design path and the repo root, told to check
   claims against the code.
@@ -72,7 +73,7 @@ file, `clean` only when it raised nothing blocking or should-fix.
 A hired `ritual-goldfish` works from a worktree cut at a commit, so commit the design on the flow's
 branch before hiring it; its review stays in the agent's output, and you point `approve` at it.
 
-Resolve findings in the design (or with `/egm:egm-resolve`), then review again. Each review
+Resolve findings in the design (or by running EGM's `egm-resolve`), then review again. Each review
 records the digest it read; an edit after a clean review needs a new review. Keep earlier reviews
 as history and mark their `design-sha256: superseded`.
 

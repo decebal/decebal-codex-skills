@@ -36,7 +36,7 @@ demonstrate.
 |---|---|---|
 | Skills | 61 workflows under [`skills/`](skills/) | Planning, testing, browser work, architecture, Rust, TypeScript, growth, deployment, media, and review |
 | Chronis workflow | `$codex-prd` → `$codex-beads` → `cn ready/claim/done` | Turning requirements into dependency-aware execution with durable history |
-| Ritual flow | [`$ritual`](skills/ritual/SKILL.md) and [`$ritual-full`](skills/ritual-full/SKILL.md): Think, Spec, Plan, Build, Review, Ship, Reflect on one Chronis epic | Planned work with a file per step, gates between steps, and one human approval of the design |
+| Ritual flow | [`$ritual`](skills/ritual/SKILL.md) and [`$ritual-full`](skills/ritual-full/SKILL.md): Think, Spec, Plan, Build, Review, Ship, Reflect on one Chronis epic | Planned work with a file per step, gates between steps, and one human approval of the design. What to install for Codex and Claude Code: [ritual install checklist](https://github.com/decebal/decebal-claude-skills/blob/main/docs/ritual-install.md) |
 | Agent instructions | Root [`AGENTS.md`](AGENTS.md) plus project [`templates/`](templates/) | Repository conventions Codex loads automatically |
 | Portable rules | 21 focused [`rules/`](rules/) with incidents and exceptions; file-type rules carry `paths:` and reach a session through `codex-guard rule-scope` | Selecting instruction fragments worth carrying into another codebase |
 | Quality gates | 21-crate Rust workspace under [`gates/rust/`](gates/rust/) | Turning selected rules into fast, testable failures |
