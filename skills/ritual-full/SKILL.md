@@ -24,8 +24,9 @@ Run each check, print one table, then stop if any row is `missing`:
 | cos | `cos ritual check --help` exits 0 | clone `decebal/chief-of-staff-v2`, run `task setup` in it |
 | graphify | `graphify --help` exits 0; `graphify-out/` in the repo, else build it | `uv tool install graphifyy` then `graphify codex install`; the same reinstall fixes `graphify --help` exiting 126 with `bad interpreter` |
 | codex-guard | `command -v codex-guard` finds it (it has no `--help`; with no subcommand it prints usage and exits 2); the trusted Codex hooks config registers `codex-guard infra-guard`, `bash-hygiene` and `pr-guard` | `cargo install --path gates/rust/codex-guard` from this repo, then register the hooks as `configs/hooks.json` shows and trust them |
+| ritual-feedback | `ritual-feedback --version` exits 0 | `cargo install --locked --git https://github.com/decebal/decebal-claude-skills ritual-feedback` |
 
-Report: `preflight: cn ok · egm ok · skills ok · cos ok · graphify ok · codex-guard ok`, with
+Report: `preflight: cn ok · egm ok · skills ok · cos ok · graphify ok · codex-guard ok · feedback ok`, with
 `missing (<install command>)` in place of `ok` where it applies. Codex cannot start an `/egm:`
 command: for every EGM step below, give the user the exact command to run in Claude Code on the
 same checkout and wait for its output file.
@@ -86,7 +87,8 @@ VERIFY changed, goes in the report's Drift section and in the design, in the sam
 ## Everything else
 
 Finding the step, the `ritual-*` lines, where the epic and files live, the gates, bugs skipping
-Think and Spec, and per-org notes ([repo-notes.md](../ritual/references/repo-notes.md)) are as in
-[ritual](../ritual/SKILL.md).
+Think and Spec, recording feedback with `--skill ritual-full`
+([Feedback](../ritual/SKILL.md#feedback)), and per-org notes
+([repo-notes.md](../ritual/references/repo-notes.md)) are as in [ritual](../ritual/SKILL.md).
 
 Ported from [decebal-claude-skills](https://github.com/decebal/decebal-claude-skills/tree/main/skills/ritual-full).
