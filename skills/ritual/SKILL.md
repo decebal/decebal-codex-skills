@@ -12,7 +12,8 @@ the machine and shows which step it is in (`cos flows`); every step also works w
 
 This skill routes. It names the step, loads that step's reference, and stops at each gate.
 
-**Requires** Chronis (`cn`, `cargo install chronis`). **Optional:** EGM (a Claude Code plugin),
+**Requires** Chronis (`cn`, `cargo install chronis`) and `ritual-feedback` ([Feedback](#feedback)).
+**Optional:** EGM (a Claude Code plugin),
 `cos`, graphify, codex-guard; [ritual-full](../ritual-full/SKILL.md) turns them all on. Install
 and a worked example:
 [ritual, zero to hero](https://github.com/decebal/decebal-claude-skills/blob/main/docs/ritual-zero-to-hero.md).
@@ -72,6 +73,41 @@ line in the repo's docs index in the same commit.
 
 A human approves the design; nothing else in the flow waits on a person. Manual and external
 actions never become beads ([actionability.md](references/actionability.md)).
+
+## Feedback
+
+Every run records what happened, so this skill improves from evidence rather than memory.
+`ritual-feedback` appends events to an embedded AllSource store at `~/.ritual/feedback`
+(`$RITUAL_FEEDBACK_DIR` overrides), shared with Claude Code runs on the same machine. Install:
+`cargo install --locked --git https://github.com/decebal/decebal-claude-skills ritual-feedback`.
+
+Record one event at each of these moments with `--agent codex`, and `--skill ritual-full` when
+that skill runs the flow.
+
+| When | `--kind` |
+|---|---|
+| a step hands over its file | `step_done` |
+| a gate refuses: `cos ritual check`, a test run, a review with findings | `gate_failed` |
+| work is redone because a step's output was wrong | `rework` |
+| the user corrects you | `correction` |
+| Reflect finds the code and the design apart | `drift` |
+| this skill's text was unclear, missing or wrong | `friction` |
+| a rule here prevented a mistake | `praise` |
+
+```bash
+ritual-feedback record --agent codex --epic <id> --step build --kind correction \
+  --note "<what happened, in one sentence>" \
+  --reference references/build.md --must "<what the skill should have said>"
+```
+
+When an event shows the skill text should change, add `--reference` (a file in this skill, such
+as `references/build.md`; with `--skill ritual-full` it is `SKILL.md`, its only file) and
+`--must` or `--must-not`: the phrase that file must, or must no longer, contain once fixed. Those
+events are the cases a weekly autoresearch loop scores candidate edits against
+([ritual feedback](https://github.com/decebal/decebal-claude-skills/blob/main/docs/ritual-feedback.md)).
+The loop edits the Claude skills; kept changes are ported here by hand. Under this skill a
+missing binary never blocks a step: say so in the step report and install it. `ritual-full`'s
+preflight requires it.
 
 ## EGM
 
