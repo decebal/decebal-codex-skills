@@ -12,7 +12,8 @@ the machine and shows which step it is in (`cos flows`); every step also works w
 
 This skill routes. It names the step, loads that step's reference, and stops at each gate.
 
-**Requires** Chronis (`cn`, `cargo install chronis`). **Optional:** EGM (installed as a Codex plugin),
+**Requires** Chronis (`cn`, `cargo install chronis`) and `ritual-feedback` ([Feedback](#feedback)).
+**Optional:** EGM (a Claude Code plugin),
 `cos`, graphify, codex-guard; [ritual-full](../ritual-full/SKILL.md) turns them all on. Install
 and a worked example:
 [ritual, zero to hero](https://github.com/decebal/decebal-claude-skills/blob/main/docs/ritual-zero-to-hero.md).
@@ -73,28 +74,49 @@ line in the repo's docs index in the same commit.
 A human approves the design; nothing else in the flow waits on a person. Manual and external
 actions never become beads ([actionability.md](references/actionability.md)).
 
+## Feedback
+
+Every run records what happened, so this skill improves from evidence rather than memory.
+`ritual-feedback` appends events to an embedded AllSource store at `~/.ritual/feedback`
+(`$RITUAL_FEEDBACK_DIR` overrides), shared with Claude Code runs on the same machine. Install:
+`cargo install --locked --git https://github.com/decebal/decebal-claude-skills ritual-feedback`.
+
+Record one event at each of these moments with `--agent codex`, and `--skill ritual-full` when
+that skill runs the flow.
+
+| When | `--kind` |
+|---|---|
+| a step hands over its file | `step_done` |
+| a gate refuses: `cos ritual check`, a test run, a review with findings | `gate_failed` |
+| work is redone because a step's output was wrong | `rework` |
+| the user corrects you | `correction` |
+| Reflect finds the code and the design apart | `drift` |
+| this skill's text was unclear, missing or wrong | `friction` |
+| a rule here prevented a mistake | `praise` |
+
+```bash
+ritual-feedback record --agent codex --epic <id> --step build --kind correction \
+  --note "<what happened, in one sentence>" \
+  --reference references/build.md --must "<what the skill should have said>"
+```
+
+When an event shows the skill text should change, add `--reference` (a file in this skill, such
+as `references/build.md`; with `--skill ritual-full` it is `SKILL.md`, its only file) and
+`--must` or `--must-not`: the phrase that file must, or must no longer, contain once fixed. Those
+events are the cases a weekly autoresearch loop scores candidate edits against
+([ritual feedback](https://github.com/decebal/decebal-claude-skills/blob/main/docs/ritual-feedback.md)).
+The loop edits the Claude skills; kept changes are ported here by hand. Under this skill a
+missing binary never blocks a step: say so in the step report and install it. `ritual-full`'s
+preflight requires it.
+
 ## EGM
 
-The Elephant-Goldfish Model (`egm@egm`) is the deeper Think, Spec and Reflect path, and you run
-it. Install it as a Codex plugin (marketplace `https://github.com/google/elephant-goldfish-model`;
-`~/.codex/config.toml` shows `[plugins."egm@egm"] enabled = true`), then:
-
-- Select the installed `egm` skill for the step, read the plugin's `docs/codex.md` first, and
-  follow the skill's `SKILL.md`.
-- Spawn its Goldfish reviewers with `spawn_agent` in fresh contexts, never forking this turn;
-  `docs/codex.md` maps each persona (`egm-design`, …) to its file under `agents/`. Never review
-  in your own context.
-- At each EGM checkpoint ask the user its one question, unless they asked for the uninterrupted
-  run.
-
-| Step | EGM skill | Writes |
-|---|---|---|
-| Think | `egm-brainstorm` | `concepts_brief.md` |
-| Spec | `egm-draft`, then `egm-review`, `egm-resolve` or `egm-review-loop` | `design_draft.md`, review reports |
-| Reflect | `egm-drift-report` | the drift report |
-
-The persona reviewers are read-only: write each stage's report from their output yourself. Move
-`concepts_brief.md` and `design_draft.md` to the dated paths above and index them.
+The Elephant-Goldfish Model (`egm@egm`) is the deeper Think and Spec path. It is a Claude Code
+plugin whose skills only a person can start, so Codex cannot run it: give the user the exact
+command to run in a Claude Code session on the same checkout (`/egm:egm-brainstorm`,
+`/egm:egm-draft`, `/egm:egm-review`, `/egm:egm-resolve`, `/egm:egm-drift-report`) and wait for its
+file. EGM writes `concepts_brief.md` and `design_draft.md` in the working directory; move them to
+the dated paths above and index them.
 
 ## Graphs
 

@@ -23,6 +23,11 @@ Which gates caught what. A gate that never failed on this flow is worth a look: 
 ## Drift
 Where the code departs from the design, and which one was updated.
 
+## Feedback
+`ritual-feedback list --epic <id>`: the events by kind. Every correction, rework or friction
+that points at this skill's text carries a `--reference` and a check; record one now where it
+is missing.
+
 ## Next
 Follow-up work as new epics or beads, never as notes.
 ```
@@ -39,5 +44,6 @@ interfaces with the code by hand. Fix the design in the same change.
 
 ```bash
 cn task edit <epic> --append-description "ritual-report: docs/reports/YYYY-MM-DD-<slug>.md" --toon
+ritual-feedback record --agent codex --epic <epic> --step reflect --kind step_done --note "Report at <path>"
 cn done <epic> --toon --reason "Shipped in <PR>; report at <path>"
 ```
