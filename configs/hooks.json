@@ -68,6 +68,18 @@
         ]
       }
     ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard stop-guard",
+            "timeout": 5,
+            "statusMessage": "Checking unfinished delivery"
+          }
+        ]
+      }
+    ],
     "PostCompact": [
       {
         "hooks": [
