@@ -29,6 +29,8 @@ For an authorized fix handoff, include the tested build and environment, route a
 
 ## Establish a baseline
 
+Use [the review template](assets/ui-review-template.md) in the product's existing ritual artifacts. Complete its WCAG audit, design judgment, page and state coverage, decisions, and gate evidence. Use the installed accessibility audit and design-taste skills when available; otherwise apply the template and name the unavailable skill. Adapt guidance to the product and its existing stack and design system.
+
 Inventory every reachable page and material state in scope, including entry points, empty, loading, error and populated states, responsive sizes, themes and input modes where applicable. Record exclusions and access blockers. Map each page to its user goal, primary action, source implementation and shared patterns. Start the actual application using a bounded, owned process; inspect the rendered product, not source alone. Record build identity, environment, viewport, state and date for every capture. Never equate a remote preview with a local checkout without evidence binding them.
 
 Capture comparable screenshots for representative states and widths, then exercise the critical journey, keyboard focus and recovery paths. Check hierarchy, understandable labels, content, navigation, spacing, typography, contrast, responsive reflow, interaction feedback and accessibility. Record observed defects with trigger, user consequence, location and evidence; mark unobserved states unverified. Consider how a local fix affects every consumer of a shared component.
@@ -38,6 +40,10 @@ For efficiency, discover routes and shared components once, then batch determini
 For shared navigation and footer changes, inventory every page family and rendering path that uses them. At narrow and wide sizes, check visible labels, link destinations, reflow and keyboard order and focus, including a journey through the actual links. Capture representative header and footer states and record which families were exercised. If a regression gate checks source structure alone, keep it and add rendered checks where the project can run them; do not treat source presence as proof of working navigation.
 
 ## Decide and refine
+
+Audit controls and text links across every page family and state, including guides, generated pages and printable screen views. Record when a control is needed, its semantic role, approved component or style, and its focus, hover, disabled and error states. Check adjacent actions have visible separation at narrow and wide widths and remain usable with keyboard and touch. Compare ordinary text links consistently while distinguishing navigation, inline links, destructive actions and deliberate exceptions. Shared headers alone do not make a standalone page visually consistent. Preserve print-specific layouts and access to the underlying content.
+
+Map these decisions to deterministic contribution checks where practical: reject unapproved control implementations or missing shared styles and test both valid and invalid examples. Exercise rendered action spacing and link treatments across representative page families and responsive widths; report coverage and failures per route. Keep visual judgment and necessity of each control as human review criteria. Run checks in the project's actual CI and installed hook chain without replacing existing hooks; report whether each path can block a contribution and which contributors it covers.
 
 For each page, record the intended user outcome, alternatives, decision and rationale. Link before/after screenshots and actual source examples. Reuse existing decisions and tokens when suitable; document deliberate exceptions and their scope. Keep product-specific values in the product, with portable workflow instructions here. Update decisions when superseded instead of leaving conflicting rules. Do not present a proposed design as accepted without an authorized decision.
 
