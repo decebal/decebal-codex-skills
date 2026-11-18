@@ -1,7 +1,7 @@
 # Spec
 
 Write the design, have it reviewed by someone who did not write it, and get a human to approve
-it. Output: `docs/plans/YYYY-MM-DD-<slug>-design.md`, its review beside it, both committed on the
+it. Output: `docs/plans/YYYY-MM-DD-<slug>-design.md`, its two reviews beside it, committed on the
 flow's branch, and an approved epic.
 
 ## The branch
@@ -21,9 +21,9 @@ copy while the branch exists, and a hired reviewer's worktree is cut from it.
 
 ## Draft (the Elephant)
 
-The author has the full context. Either draft here or ask the user to run `/egm:egm-draft` with
-the brief in a Claude Code session on the same checkout (EGM is a Claude Code plugin; Codex cannot
-start it). EGM writes `design_draft.md`, which you move to the dated path.
+The author has the full context and drafts here. EGM's `/egm:egm-draft` (writes
+`design_draft.md`, moved to the dated path) runs only when the user asks for EGM
+([Opt-in: EGM](../SKILL.md#opt-in-egm)).
 
 A design covers:
 
@@ -44,17 +44,19 @@ Name the design on the epic:
 
 ## Review (the Goldfish)
 
-The reviewer reads only the draft and the live code, never the author's conversation. A reviewer
-that read the chat inherits its blind spots. Pick one:
+A reviewer reads only the draft and the live code, never the author's conversation. A reviewer
+that read the chat inherits its blind spots.
 
-- the user runs `/egm:egm-review <path>` in Claude Code (EGM starts its own isolated reviewers);
-- `cos` hires `ritual-goldfish` on the design;
-- a fresh Codex session (`codex exec`) given only the design path and the repo root, told to check
-  claims against the code.
+Start two reviewer agents with `spawn_agent`, each in a fresh context (or a fresh `codex exec`
+session), each given only the design path and the repo root and told to check every claim against
+the code. They never see each other's output, and each writes its own review file with a verdict
+line. A `cos`-hired `ritual-goldfish` may be one of the two. EGM's `egm-review`, which you run
+([Opt-in: EGM](../SKILL.md#opt-in-egm)), stands in only when the user asks for EGM. `allstack spec review` replaces the two agents once it is merged
+in allstack source and the binary is rebuilt.
 
-If none of these can start a fresh context, stop: do not review in the author's context.
+If no fresh context can start, stop: do not review in the author's context.
 
-The review is `docs/plans/YYYY-MM-DD-<slug>-design-review.md`:
+Each review is `docs/plans/YYYY-MM-DD-<slug>-design-review-<a|b>.md`:
 
 ```markdown
 ---
@@ -66,34 +68,35 @@ verdict: clean | findings
 1. <blocking | should | nit> <section>: <problem>. Evidence: <file:line or command>. Fix: <fix>.
 ```
 
-EGM's review writes `goldfish_review_report.md` without a verdict line: record its outcome in this
-file, `clean` only when it raised nothing blocking or should-fix.
+A review with no `verdict:` line is not a review: send it back. On the EGM path, its
+`goldfish_review_report.md` has none, so record its outcome in this file, `clean` only when it
+raised nothing blocking or should-fix.
 
 A hired `ritual-goldfish` works from a worktree cut at a commit, so commit the design on the flow's
 branch before hiring it; its review stays in the agent's output, and you point `approve` at it.
 
-Resolve findings in the design (or with `/egm:egm-resolve`), then review again. Each review
-records the digest it read; an edit after a clean review needs a new review. Keep earlier reviews
-as history and mark their `design-sha256: superseded`.
+Approval needs both reviews `clean` against the same digest. Resolve findings in the design, then
+run both again. Each review records the digest it read; an edit after a clean review needs new
+reviews. Keep earlier reviews as history and mark their `design-sha256: superseded`.
 
 ## Approve
 
-The approval is the user's decision. Show the user the design and the clean review, then wait.
-Two ways it happens:
+The approval is the user's decision; running the command is your job. Ask in conversation: name
+the design, its digest and both clean reviews, and ask whether to approve. Never hand the user
+the command. When they tell you to approve, run it yourself and quote their instruction in your
+report:
 
-- the user runs the command in their own terminal:
+```bash
+cos ritual approve <epic> docs/plans/YYYY-MM-DD-<slug>-design.md --by "<name>" \
+  --review docs/plans/YYYY-MM-DD-<slug>-design-review-b.md --yes
+```
 
-  ```bash
-  cos ritual approve <epic> docs/plans/YYYY-MM-DD-<slug>-design.md --by "<name>" \
-    --review docs/plans/YYYY-MM-DD-<slug>-design-review.md
-  ```
-
-- the user tells you to approve in this conversation. First run `cos ritual approve --help` and
-  check that it lists `--yes`; if it does not, stop and tell the user to update chief-of-staff-v2 to
-  main. Do not run the command without `--yes`: it asks for a terminal answer you cannot give.
-  If it does, run the same command with `--yes` and quote the user's instruction in your report.
-  Never approve on your own initiative, never infer approval from silence or from a clean review,
-  and never approve to unblock yourself.
+`--review` takes the later of the two clean reviews; the other is named in the design's review
+history. Run `cos ritual approve --help` first: if it does not list `--yes`, update `cos` yourself
+(`git pull` in the chief-of-staff-v2 checkout, then `task setup`), and if that fails take the
+no-`cos` path below. Never run the command without `--yes`: it waits for a terminal answer nobody
+gives. Never approve on your own initiative, never infer approval from silence or from a clean
+review, and never approve to unblock yourself.
 
 It refuses unless the review names this design, its `design-sha256` matches the design's current
 digest and its verdict is `clean`. Without `--yes` it asks for confirmation and refuses without a
@@ -101,7 +104,7 @@ terminal. Then it appends `ritual-approved: <path> sha256:<digest> by <name>` to
 `cn approve <epic>`. `--without-review` replaces `--review` for designs too small to review, and
 says so in the line it writes. `--by` is a name the caller types, not a verified identity.
 
-Without `cos`, the user computes `shasum -a 256 <design>`, appends the same line, and runs
-`cn approve <epic>`; if the user tells you to, you run `cn approve <epic>` after that line exists.
+Without `cos`, once the user tells you to approve, you compute `shasum -a 256 <design>`, append
+the same line with `cn task edit <epic> --append-description`, and run `cn approve <epic>`.
 
 Then the next step is Plan ([plan.md](plan.md)).

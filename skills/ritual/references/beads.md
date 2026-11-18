@@ -5,9 +5,9 @@ One bead per story, under the approved epic, wired as a dependency graph. Tracke
 
 ## Before cutting
 
-1. `cn` is on `PATH`; if not, stop and tell the user (`cargo install chronis`).
-2. A repo with `.beads/` and no `.chronis/` still runs the old tracker: suggest
-   `cn migrate-beads --toon` and wait for the user.
+1. `cn` is on `PATH`; if not, run `cargo install chronis` yourself.
+2. A repo with `.beads/` and no `.chronis/` still runs the old tracker: run
+   `cn migrate-beads --toon` yourself and report what it moved.
 3. `cos ritual check <epic>` exits 0 (see `plan.md`).
 4. Audit the open and in-progress beads already in the repo for actionability
    ([actionability.md](actionability.md)) before adding more.
@@ -63,7 +63,8 @@ cn dep add <US-002 id> <US-001 id> --toon
 Every bead of an epic lands on the same short-lived branch and merges as one PR when the feature
 works end to end. Size is never a reason to split a feature into several PRs. Separate PRs only
 for features that share no end-to-end path. Parallel agents converge on the same branch, each in
-its own worktree with a detached HEAD, pushing with `git push origin HEAD:<branch>`.
+its own worktree with a detached HEAD, pushing with `git push origin HEAD:<branch>`. Keep
+concurrent worktrees near cores / 4 and run one compile at a time: more starves every gate.
 
 The branch is the one Spec cut and named on the epic (`ritual-branch:`); stamp it into every bead.
 A bug flow that skipped Spec cuts and names it here, using the repo's own branch and PR title rule

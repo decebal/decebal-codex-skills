@@ -3,17 +3,16 @@
 Turn an idea into a brief worth designing. Output: `docs/plans/YYYY-MM-DD-<slug>-brief.md` and a
 Chronis epic that names it.
 
-## Two paths
-
-- **Here, in conversation:** follow the process below.
-- **EGM:** ask the user to run `/egm:egm-brainstorm` in a Claude Code session on the same
-  checkout (EGM is a Claude Code plugin; Codex cannot start it). When it finishes, move
-  `concepts_brief.md` to the dated brief path and index it.
+Think runs here, in conversation. EGM's `/egm:egm-brainstorm` replaces the process below only
+when the user asks for EGM ([Opt-in: EGM](../SKILL.md#opt-in-egm)).
 
 ## Process
 
 1. Read the project first: its docs index, recent commits, the code the idea touches. If the repo
-   has `graphify-out/`, query the graph for the modules involved (see `graph.md`).
+   has `graphify-out/`, query the graph for the modules involved (see `graph.md`). Run
+   `allstack recall "<topic>"` for earlier decisions and reviews, and cite any hit in the brief.
+   `allstack catalog` names the repo's workflows when it has `workflows/catalog.toml`: a bug with a
+   clear reproduction is the bugfix path (skip to Build).
 2. Ask one question per message, multiple choice where possible. Cover purpose, constraints, and
    what "done" means for a user.
 3. Propose two or three approaches with their trade-offs. Lead with the one you recommend and say
