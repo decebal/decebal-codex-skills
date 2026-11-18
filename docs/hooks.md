@@ -27,6 +27,18 @@ Multiple matching command hooks launch concurrently. One hook cannot prevent ano
 
 See [`../configs/hooks.json`](../configs/hooks.json) for compiled guard wiring.
 
+`stop-guard` requests one continuation when a final message reports unfinished
+review, verification, gates, or PR delivery. The continuation must address
+fixable failures and preserve real user-approval or access blockers. A continued
+turn can stop and report a blocker; this prevents infinite loops. Detection uses
+the final message and a bounded check of the current Git branch, dirty files,
+and GitHub PR list. It cannot reliably attribute dirty files to this chat,
+inspect separate worktrees, or detect every unfinished task. It allows on
+missing GitHub access and permits a stop after one continuation. Confirm PR
+state and completion separately. Install the updated
+`codex-guard` binary and enable the `Stop` entry in the active hook configuration
+to use it.
+
 ## Command hook
 
 ```json

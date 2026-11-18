@@ -27,6 +27,7 @@ mod prompt_number;
 mod rule_scope;
 mod session_state;
 mod stack_guard;
+mod stop_guard;
 mod trust;
 
 #[cfg(test)]
@@ -52,10 +53,11 @@ fn main() -> ExitCode {
             | "prompt-number"
             | "rule-scope"
             | "comment-hygiene"
+            | "stop-guard"
     );
     if !hookish {
         eprintln!(
-            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|stack-guard|prompt-number|rule-scope|comment-hygiene|trust>"
+            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|stack-guard|prompt-number|rule-scope|comment-hygiene|stop-guard|trust>"
         );
         return ExitCode::from(2);
     }
@@ -72,6 +74,7 @@ fn main() -> ExitCode {
         "prompt-number" => prompt_number::run(&payload),
         "rule-scope" => rule_scope::run(&payload),
         "comment-hygiene" => comment_hygiene::run(&payload),
+        "stop-guard" => stop_guard::run(&payload),
         _ => unreachable!("checked above"),
     }
 }
