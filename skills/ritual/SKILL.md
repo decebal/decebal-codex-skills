@@ -140,17 +140,20 @@ uses only these subcommands, starts no allstack run, and never runs `allstack in
 
 ## Opt-in: EGM
 
-The Elephant-Goldfish Model (`egm@egm`) is off by default. It is a Claude Code plugin whose skills
-only a person can start, so Codex never runs it. Offer it only when the user asks for EGM, and
-only after `claude plugin list` shows `egm@egm` enabled; otherwise say it is missing and run the
-native default. On a yes, give the user the exact command to run in a Claude Code session on the
-same checkout and wait for its file.
+The Elephant-Goldfish Model (`egm@egm`) is off by default, and you run it yourself when the user
+asks for EGM; never hand the user a command. It needs `codex plugin add egm@egm`: install it
+yourself when it is missing (it loads in the next session; until then run the native default and
+say so). Read the plugin's `docs/codex.md`, then the step's `skills/egm-<step>/SKILL.md` under
+`~/.codex/plugins/cache/egm/egm/<version>/`, and follow it. Spawn each Goldfish with
+`spawn_agent` and `fork_context: false` (or `fork_turns: "none"`), passing absolute paths to its
+persona under the plugin's `agents/`; never review in your own context. At an EGM checkpoint
+question, follow ritual-full's Decisions section when it runs the flow, else ask in conversation.
 
-| Step | Native default | EGM command | Trigger |
+| Step | Native default | EGM skill | Trigger |
 |---|---|---|---|
-| Think | brief in conversation ([think.md](references/think.md)) | `/egm:egm-brainstorm` | user asks for EGM |
-| Spec | native draft; two fresh-context reviewers ([spec.md](references/spec.md)) | `/egm:egm-draft`, `/egm:egm-review`, `/egm:egm-resolve` | user asks for EGM |
-| Reflect | drift compared by hand ([reflect.md](references/reflect.md)) | `/egm:egm-drift-report` | user asks for EGM |
+| Think | brief in conversation ([think.md](references/think.md)) | `egm-brainstorm` | user asks for EGM |
+| Spec | native draft; two fresh-context reviewers ([spec.md](references/spec.md)) | `egm-draft`, `egm-review`, `egm-resolve` | user asks for EGM |
+| Reflect | drift compared by hand ([reflect.md](references/reflect.md)) | `egm-drift-report` | user asks for EGM |
 
 Move `concepts_brief.md` and `design_draft.md` to the dated paths above and index them.
 

@@ -5,9 +5,9 @@ One bead per story, under the approved epic, wired as a dependency graph. Tracke
 
 ## Before cutting
 
-1. `cn` is on `PATH`; if not, stop and tell the user (`cargo install chronis`).
-2. A repo with `.beads/` and no `.chronis/` still runs the old tracker: suggest
-   `cn migrate-beads --toon` and wait for the user.
+1. `cn` is on `PATH`; if not, run `cargo install chronis` yourself.
+2. A repo with `.beads/` and no `.chronis/` still runs the old tracker: run
+   `cn migrate-beads --toon` yourself and report what it moved.
 3. `cos ritual check <epic>` exits 0 (see `plan.md`).
 4. Audit the open and in-progress beads already in the repo for actionability
    ([actionability.md](actionability.md)) before adding more.

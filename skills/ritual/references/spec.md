@@ -50,8 +50,8 @@ that read the chat inherits its blind spots.
 Start two reviewer agents with `spawn_agent`, each in a fresh context (or a fresh `codex exec`
 session), each given only the design path and the repo root and told to check every claim against
 the code. They never see each other's output, and each writes its own review file with a verdict
-line. A `cos`-hired `ritual-goldfish` may be one of the two. EGM's `/egm:egm-review` stands in
-only when the user asks for EGM. `allstack spec review` replaces the two agents once it is merged
+line. A `cos`-hired `ritual-goldfish` may be one of the two. EGM's `egm-review`, which you run
+([Opt-in: EGM](../SKILL.md#opt-in-egm)), stands in only when the user asks for EGM. `allstack spec review` replaces the two agents once it is merged
 in allstack source and the binary is rebuilt.
 
 If no fresh context can start, stop: do not review in the author's context.
@@ -81,25 +81,22 @@ reviews. Keep earlier reviews as history and mark their `design-sha256: supersed
 
 ## Approve
 
-The approval is the user's decision. Show the user the design and both clean reviews, then wait.
-Two ways it happens:
+The approval is the user's decision; running the command is your job. Ask in conversation: name
+the design, its digest and both clean reviews, and ask whether to approve. Never hand the user
+the command. When they tell you to approve, run it yourself and quote their instruction in your
+report:
 
-- the user runs the command in their own terminal:
+```bash
+cos ritual approve <epic> docs/plans/YYYY-MM-DD-<slug>-design.md --by "<name>" \
+  --review docs/plans/YYYY-MM-DD-<slug>-design-review-b.md --yes
+```
 
-  ```bash
-  cos ritual approve <epic> docs/plans/YYYY-MM-DD-<slug>-design.md --by "<name>" \
-    --review docs/plans/YYYY-MM-DD-<slug>-design-review-b.md
-  ```
-
-  `--review` takes the later of the two clean reviews; the other is named in the design's review
-  history.
-
-- the user tells you to approve in this conversation. First run `cos ritual approve --help` and
-  check that it lists `--yes`; if it does not, stop and tell the user to update chief-of-staff-v2 to
-  main. Do not run the command without `--yes`: it asks for a terminal answer you cannot give.
-  If it does, run the same command with `--yes` and quote the user's instruction in your report.
-  Never approve on your own initiative, never infer approval from silence or from a clean review,
-  and never approve to unblock yourself.
+`--review` takes the later of the two clean reviews; the other is named in the design's review
+history. Run `cos ritual approve --help` first: if it does not list `--yes`, update `cos` yourself
+(`git pull` in the chief-of-staff-v2 checkout, then `task setup`), and if that fails take the
+no-`cos` path below. Never run the command without `--yes`: it waits for a terminal answer nobody
+gives. Never approve on your own initiative, never infer approval from silence or from a clean
+review, and never approve to unblock yourself.
 
 It refuses unless the review names this design, its `design-sha256` matches the design's current
 digest and its verdict is `clean`. Without `--yes` it asks for confirmation and refuses without a
@@ -107,7 +104,7 @@ terminal. Then it appends `ritual-approved: <path> sha256:<digest> by <name>` to
 `cn approve <epic>`. `--without-review` replaces `--review` for designs too small to review, and
 says so in the line it writes. `--by` is a name the caller types, not a verified identity.
 
-Without `cos`, the user computes `shasum -a 256 <design>`, appends the same line, and runs
-`cn approve <epic>`; if the user tells you to, you run `cn approve <epic>` after that line exists.
+Without `cos`, once the user tells you to approve, you compute `shasum -a 256 <design>`, append
+the same line with `cn task edit <epic> --append-description`, and run `cn approve <epic>`.
 
 Then the next step is Plan ([plan.md](plan.md)).

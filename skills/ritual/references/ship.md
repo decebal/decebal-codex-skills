@@ -12,8 +12,9 @@ One PR, one commit, with evidence a reviewer can open.
    observed with its `allstack check` receipt directory. The forge's `UNVERIFIED:` lines and
    prove-it's hand-checks go in the body as "Open questions" and "Verify by hand".
 3. **Open the PR** with a title in the repo's convention (see the org's notes, `repo-notes.md`, for ticket keys), a body
-   with a summary, a test plan of ticked checkboxes, and a link to the design. pr-guard asks
-   while the test plan has unticked items and denies a second open PR in the session.
+   with a summary, a test plan of ticked checkboxes, and a link to the design. Tick each item
+   only after running it: pr-guard prompts while the test plan has unticked items, and denies a
+   second open PR in the session.
 4. **Name it on the epic:** `ritual-pr: <url>`.
 5. **Deploys are reported in two parts.** A workflow dispatched is not a service deployed: report
    the dispatch, then read the deployed state (the revision, the version, the URL) before saying
