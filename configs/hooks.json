@@ -34,6 +34,12 @@
             "command": "codex-guard rule-scope",
             "timeout": 5,
             "statusMessage": "Loading path-scoped rules"
+          },
+          {
+            "type": "command",
+            "command": "codex-guard worktree-guard",
+            "timeout": 5,
+            "statusMessage": "Checking worktree safety"
           }
         ]
       },
@@ -51,6 +57,17 @@
             "command": "codex-guard rule-scope",
             "timeout": 5,
             "statusMessage": "Loading path-scoped rules"
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__codex_app__create_worktree$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard worktree-guard",
+            "timeout": 5,
+            "statusMessage": "Checking worktree safety"
           }
         ]
       }
@@ -75,6 +92,18 @@
             "type": "command",
             "command": "codex-guard rule-scope",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-guard worktree-guard",
+            "timeout": 5,
+            "statusMessage": "Checking worktree safety"
           }
         ]
       }

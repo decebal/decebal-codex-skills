@@ -28,6 +28,7 @@ mod rule_scope;
 mod session_state;
 mod stack_guard;
 mod trust;
+mod worktree_guard;
 
 #[cfg(test)]
 #[path = "payload_size_tests.rs"]
@@ -52,10 +53,11 @@ fn main() -> ExitCode {
             | "prompt-number"
             | "rule-scope"
             | "comment-hygiene"
+            | "worktree-guard"
     );
     if !hookish {
         eprintln!(
-            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|stack-guard|prompt-number|rule-scope|comment-hygiene|trust>"
+            "usage: codex-guard <infra-guard|bash-hygiene|pr-guard|stack-guard|prompt-number|rule-scope|comment-hygiene|worktree-guard|trust>"
         );
         return ExitCode::from(2);
     }
@@ -72,6 +74,7 @@ fn main() -> ExitCode {
         "prompt-number" => prompt_number::run(&payload),
         "rule-scope" => rule_scope::run(&payload),
         "comment-hygiene" => comment_hygiene::run(&payload),
+        "worktree-guard" => worktree_guard::run(&payload),
         _ => unreachable!("checked above"),
     }
 }
