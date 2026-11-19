@@ -1,10 +1,11 @@
 # codex-guard lifecycle hooks
 
-Seven optional guardrails ship as one Rust binary: [`gates/rust/codex-guard`](../gates/rust/codex-guard).
+Eight optional guardrails ship as one Rust binary: [`gates/rust/codex-guard`](../gates/rust/codex-guard).
 
 | Subcommand | Event | Effect |
 |---|---|---|
 | `codex-guard infra-guard` | `PreToolUse`, `Bash` | Denies high-blast-radius infrastructure and destructive commands |
+| `codex-guard worktree-guard` | `SessionStart`; `PreToolUse`, `Bash` and managed worktree creation | Rejects unsafe Longhand workspaces and routes worktree creation through Longhand setup |
 | `codex-guard bash-hygiene` | `PreToolUse`, `Bash` | Blocks compound shell commands/substitution; safely rewrites a redundant trailing `2>&1` |
 | `codex-guard pr-guard` | `PreToolUse`, `Bash` | Denies a second PR, or a new branch, while a PR this session created is still open in that repo |
 | `codex-guard stack-guard` | `PreToolUse`, `Bash` | Stacked PRs open as drafts, land bottom-up, keep one commit per author per layer, and are never pushed carrying a parent's stale commits |
@@ -168,6 +169,19 @@ paths:
 ## comment-hygiene
 
 Codex sends patch text through `apply_patch`'s `tool_input.command`. Guard parses added lines per file, selects language comment markers by extension, excludes documentation comments, and returns bounded advisory context. It never pretends to undo completed edits.
+
+## worktree-guard
+
+For Longhand checkouts, the startup hook checks that a linked worktree is in a
+project-local location and its required seed artifacts are present. A refused
+session must move to a properly created and seeded worktree before editing.
+The pre-tool hook denies direct `git worktree add` and managed worktree creation
+for Longhand; use `tooling/scripts/agent-worktree.sh create`. The guard does not
+remove or move any checkout.
+
+These are non-managed hooks and require explicit trust before Codex runs them.
+Shell parsing covers direct commands and common `sh`, `bash`, and `zsh`
+`-c` wrappers; dynamic commands and specialized tools can evade this check.
 
 ## Limits
 
