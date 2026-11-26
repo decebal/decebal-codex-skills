@@ -53,3 +53,25 @@ fn sitemap_fixture_runs_through_binary() {
     assert_eq!(report["valid"], true);
     assert_eq!(report["location_count"], 2);
 }
+
+#[test]
+fn sitemap_markdown_reports_locations() {
+    let output = Command::new(env!("CARGO_BIN_EXE_codex-seo"))
+        .args([
+            "sitemap",
+            "--input",
+            fixture("sitemap.xml").to_str().unwrap(),
+            "--format",
+            "markdown",
+        ])
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("- Valid: true"));
+    assert!(text.contains("- Locations: 2 / 50000"));
+}

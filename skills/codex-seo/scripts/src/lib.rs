@@ -24,7 +24,7 @@ const HELP: &str = r"codex-seo
 
 USAGE:
   codex-seo audit --input PATH_OR_URL [--base-url URL] [--format json|markdown]
-  codex-seo sitemap --input PATH_OR_URL
+  codex-seo sitemap --input PATH_OR_URL [--format json|markdown]
   codex-seo drift --before AUDIT.json --after AUDIT.json
   codex-seo doctor
 
@@ -170,13 +170,28 @@ fn audit_command(args: &[String]) -> Result<CliOutcome, String> {
 
 fn sitemap_command(args: &[String]) -> Result<CliOutcome, String> {
     let options = parse_options(args)?;
-    reject_unknown(&options, &["--input"])?;
+    reject_unknown(&options, &["--input", "--format"])?;
     let input = required(&options, "--input")?;
     let loaded = load_input(input, ExpectedContent::Xml)?;
     let report = inspect_sitemap(&loaded.text, &loaded.source)?;
     let invalid = report["valid"].as_bool() == Some(false);
+    let output = match options.get("--format").map_or("json", String::as_str) {
+        "json" => pretty(&report)?,
+        "markdown" => format!(
+            "# Sitemap inspection\n\n- Source: {}\n- Kind: {}\n- Valid: {}\n- Locations: {} / {}\n- Duplicate locations: {}\n- Invalid locations: {}\n\n{}",
+            loaded.source,
+            report["kind"].as_str().unwrap_or("unknown"),
+            report["valid"],
+            report["location_count"],
+            report["location_limit"],
+            report["duplicate_locations"],
+            report["invalid_locations"],
+            report["note"].as_str().unwrap_or_default(),
+        ),
+        _ => return Err("--format must be json or markdown".to_owned()),
+    };
     Ok(CliOutcome {
-        output: pretty(&report)?,
+        output,
         exit_code: if invalid { 2 } else { 0 },
     })
 }

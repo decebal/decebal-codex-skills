@@ -71,7 +71,7 @@ From repository root:
 cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- audit --input https://example.com --format markdown
 cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- audit --input ./page.html --base-url https://example.com/page --format json
 cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- sitemap --input https://example.com/sitemap.xml --format markdown
-cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- drift --baseline before.json --current after.json --format markdown
+cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- drift --before before.json --after after.json
 cargo run --quiet --locked --manifest-path skills/codex-seo/scripts/Cargo.toml -- doctor
 ```
 
