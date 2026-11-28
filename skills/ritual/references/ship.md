@@ -4,14 +4,17 @@ One PR, one commit, with evidence a reviewer can open.
 
 1. **Collapse the branch to one commit.** Reset to the merge-base, never a commit count:
    `git reset --soft "$(git merge-base origin/<trunk> HEAD)"`, commit with a message that lists
-   what the PR carries, and confirm `git diff <old-head> HEAD` is empty. Push with
-   `--force-with-lease`. Re-run the gates: the new SHA has no status.
+   what the PR carries (including a prove-it Review forged), and confirm `git diff <old-head> HEAD`
+   is empty. Push with `--force-with-lease`. Re-run the gates as `allstack check` receipts: the
+   new SHA has no status.
 2. **Evidence.** For a user-visible change, `pr-proof` writes the HTML report under `docs/`. For a
    backend change, the PR body carries the commands run and their output, each labelled as
-   observed.
+   observed with its `allstack check` receipt directory. The forge's `UNVERIFIED:` lines and
+   prove-it's hand-checks go in the body as "Open questions" and "Verify by hand".
 3. **Open the PR** with a title in the repo's convention (see the org's notes, `repo-notes.md`, for ticket keys), a body
-   with a summary, a test plan of ticked checkboxes, and a link to the design. pr-guard asks
-   while the test plan has unticked items and denies a second open PR in the session.
+   with a summary, a test plan of ticked checkboxes, and a link to the design. Tick each item
+   only after running it: pr-guard prompts while the test plan has unticked items, and denies a
+   second open PR in the session.
 4. **Name it on the epic:** `ritual-pr: <url>`.
 5. **Deploys are reported in two parts.** A workflow dispatched is not a service deployed: report
    the dispatch, then read the deployed state (the revision, the version, the URL) before saying

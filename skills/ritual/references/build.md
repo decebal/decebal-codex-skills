@@ -6,8 +6,10 @@ Work the ready beads on the one branch until the feature works end to end.
 
 1. Work in the flow's worktree, on the branch Spec cut (`ritual-branch:` on the epic). A bug flow
    that skipped Spec cuts it now (`git worktree add -b <branch> <path> origin/<trunk>`) and names
-   it on the epic. Seed the worktree with the repo's dependencies and a cloned build directory, so
-   a cold build does not time out a gate.
+   it on the epic. Seed the worktree with a script that verifies each step on disk (dependencies,
+   fetched binaries, a build directory cloned with `cp -Rc` on APFS) and exits non-zero when one
+   is missing, so a cold build does not time out a gate. After the push, `target-gc` frees idle
+   build directories.
 2. Confirm the branch is live before each session's first commit:
    `gh pr list --head <branch> --state all --json number,state`. `MERGED` means dead: branch fresh
    from the trunk.
@@ -35,9 +37,17 @@ For each bead:
 
 ## When every bead is done
 
-Run the epic-level gates from the epic's description. A compile, a lint or a `--no-run` build is
-not a test run, and a test filter that matched nothing proves nothing: read the test count. If a
-gate fails, cut a fix bead and loop.
+Run the epic-level gates from the epic's description, each as
+`allstack check --expect-exit 0 --seconds 270 -- <absolute path> <args>` (setup in
+[ritual's allstack section](../SKILL.md#allstack-tools-no-run)). A compile, a lint or a `--no-run`
+build is not a test run, and a test filter that matched nothing proves nothing: read the test
+count. If a gate fails, cut a fix bead and loop. One compile on the machine at a time.
+
+## After a crash
+
+Work already under an allstack run recovers with `allstack recover --epoch <n> <run>`, then
+`allstack resume --epoch <n> <run>`; take `allstack checkpoint --epoch <n> <run>` before a risky
+step. The ritual starts no run, so without one the branch and the beads are the recovery point.
 
 Then Review ([review.md](review.md)).
 

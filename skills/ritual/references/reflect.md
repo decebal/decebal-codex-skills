@@ -37,8 +37,10 @@ estimates.
 
 ## Drift check
 
-Ask the user to run `/egm:egm-drift-report` against the design in Claude Code, or compare the design's
-interfaces with the code by hand. Fix the design in the same change.
+Compare the design's interfaces with the code by hand; EGM's `/egm:egm-drift-report` does it only
+when the user asks for EGM ([Opt-in: EGM](../SKILL.md#opt-in-egm)). Fix the design in the same
+change. Optionally bind the report into recall:
+`allstack remember --kind decision --source <report> --summary "<what shipped>"`.
 
 ## Close
 
